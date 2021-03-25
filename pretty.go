@@ -1,16 +1,19 @@
 package elf
 
 import (
-	"encoding/hex"
+	"fmt"
 	"strings"
 )
 
-func (hdr *FileHeader) String() string {
+// PrettyString is used for printing cli output.
+func (hdr *FileHeader) PrettyString() string {
 	var sb strings.Builder
 
 	sb.WriteString("ELF Header :\n")
-	magic := hex.EncodeToString(hdr.Ident.Magic[:])
 	sb.WriteString("Magic: ")
-	sb.WriteString(magic + "\n")
+	for _, v := range hdr.Ident.Magic[:] {
+		s := fmt.Sprintf("%x ", v)
+		sb.WriteString(s)
+	}
 	return sb.String()
 }

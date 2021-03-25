@@ -33,8 +33,8 @@ func (p *Parser) Parse() (*Parser, error) {
 	return nil, nil
 }
 
-// ParseHeader will parse the ELF file header.
-func (p *Parser) ParseHeader() error {
+// ParseIdent will parse the identification bytes at the start of the ELF File.
+func (p *Parser) ParseIdent() error {
 
 	ident := make([]byte, EI_NIDENT)
 	var magic [4]byte
@@ -46,33 +46,33 @@ func (p *Parser) ParseHeader() error {
 	if n != EI_NIDENT || err != nil {
 		return err
 	}
-	n = copy(magic[:], ident[:4])
-	if n != 4 || string(magic[:]) != ELFMAG {
-		return errors.New("bad magic number " + string(magic[:]))
+	copy(magic[:], ident[:4])
+	if n != 16 || string(ident[:4]) != ELFMAG {
+		return errors.New("bad magic number " + string(magic[:]) + " expected : " + ELFMAG)
 	}
-	p.F.FileHeader.Ident.Magic = Magic(magic)
-	p.F.FileHeader.Ident.Class = Class(ident[EI_CLASS])
-	switch p.F.FileHeader.Ident.Class {
+	copy(p.F.Ident.Magic[:], ident[:4])
+	p.F.Ident.Class = Class(ident[EI_CLASS])
+	switch p.F.Ident.Class {
 	case ELFCLASS32:
 	case ELFCLASS64:
 	default:
 		return errors.New("bad ELF class")
 	}
-	p.F.FileHeader.Ident.Data = Data(ident[EI_DATA])
-	switch p.F.FileHeader.Ident.Data {
+	p.F.Ident.Data = Data(ident[EI_DATA])
+	switch p.F.Ident.Data {
 	case ELFDATA2LSB:
-		p.F.FileHeader.Ident.ByteOrder = binary.LittleEndian
+		p.F.Ident.ByteOrder = binary.LittleEndian
 	case ELFDATA2MSB:
-		p.F.FileHeader.Ident.ByteOrder = binary.BigEndian
+		p.F.Ident.ByteOrder = binary.BigEndian
 	default:
 		return errors.New("bad ELF byte-order")
 	}
-	p.F.FileHeader.Version = Version(ident[EI_VERSION])
-	if p.F.FileHeader.Version != EV_CURRENT {
+	p.F.Ident.Version = Version(ident[EI_VERSION])
+	if p.F.Ident.Version != EV_CURRENT {
 		return errors.New("bad ELF version")
 	}
-	p.F.FileHeader.Ident.OSABI = OSABI(ident[EI_OSABI])
-	p.F.FileHeader.Ident.ABIVersion = ABIVersion(ident[EI_ABIVERSION])
+	p.F.Ident.OSABI = OSABI(ident[EI_OSABI])
+	p.F.Ident.ABIVersion = ABIVersion(ident[EI_ABIVERSION])
 
 	// Read actual ELF Header
 	// Variables to keep track of the program header.
@@ -84,7 +84,7 @@ func (p *Parser) ParseHeader() error {
 	// var shentsize int
 	// var shnum int
 	// var shstrndx int
-	return p.parseRAWHeader(p.F.FileHeader.Ident.Class)
+	return p.parseRAWHeader(p.F.Ident.Class)
 }
 
 // CloseFile will close underlying mmap file
@@ -106,7 +106,7 @@ func (p *Parser) parseRAWHeader(c Class) error {
 			)
 			return errors.New(errString.Error())
 		}
-		if err := binary.Read(p.fs, p.F.FileHeader.Ident.ByteOrder, hdr); err != nil {
+		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
 			return err
 		}
 		fmt.Println(hdr)
@@ -122,7 +122,7 @@ func (p *Parser) parseRAWHeader(c Class) error {
 			)
 			return errors.New(errString.Error())
 		}
-		if err := binary.Read(p.fs, p.F.FileHeader.Ident.ByteOrder, hdr); err != nil {
+		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
 			return err
 		}
 		fmt.Println(hdr)

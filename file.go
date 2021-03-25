@@ -8,8 +8,8 @@ type FileIdent struct {
 	Magic      Magic            `json:"magic"`
 	Class      Class            `json:"class"`
 	Data       Data             `json:"data"`
-	OSABI      OSABI            `json:"os_abi"`
 	Version    Version          `json:"version"`
+	OSABI      OSABI            `json:"os_abi"`
 	ABIVersion ABIVersion       `json:"abi_version"`
 	ByteOrder  binary.ByteOrder `json:"byte_order"`
 }
@@ -46,7 +46,8 @@ type ProgramHeaderTable struct{}
 // this is merely used to ease the use of the package as a library
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
-	FileHeader FileHeader
-	Header32   *ELF32Header
-	Header64   *ELF64Header
+	Ident    FileIdent
+	Header   FileHeader
+	Header32 *ELF32Header
+	Header64 *ELF64Header
 }
