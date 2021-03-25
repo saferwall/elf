@@ -2,5 +2,7 @@ github.com/edsrzf/mmap-go v1.0.0 h1:CEBF7HpRnUCSJgGUb5h1Gm7e3VkmVDrR8lvWVLtrOFw=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/saferwall/binstream v0.1.0 h1:KIC1ToVpNoMIlIMtVMdN38Qq4sPp+hPYboaCaOB3taw=
 github.com/saferwall/binstream v0.1.0/go.mod h1:RRSF+ePir1XKbQF4BlnShbs6u1PI0io90/lGvw/Qq1s=
+github.com/saferwall/binstream v0.1.1 h1:ATLUHjjM1w0/75pV+/O7OY1BB5UDLicG1ohewllQsYk=
+github.com/saferwall/binstream v0.1.1/go.mod h1:RRSF+ePir1XKbQF4BlnShbs6u1PI0io90/lGvw/Qq1s=
 golang.org/x/sys v0.0.0-20210319071255-635bc2c9138d h1:jbzgAvDZn8aEnytae+4ou0J0GwFZoHR0hOrTg4qH8GA=
 golang.org/x/sys v0.0.0-20210319071255-635bc2c9138d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
