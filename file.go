@@ -47,7 +47,6 @@ type ProgramHeaderTable struct{}
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
 	Ident    FileIdent
-	Header   FileHeader
 	Header32 *ELF32Header
 	Header64 *ELF64Header
 }

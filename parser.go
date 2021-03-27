@@ -37,7 +37,7 @@ func (p *Parser) Parse() (*Parser, error) {
 func (p *Parser) ParseIdent() error {
 
 	ident := make([]byte, EI_NIDENT)
-	var magic [4]byte
+	magic := make([]byte, 4)
 	// Read the ELF Header E_Ident array.
 	// This step helps find out the architecture
 	// that the binary targets, as well as OS ABI version
@@ -46,11 +46,11 @@ func (p *Parser) ParseIdent() error {
 	if n != EI_NIDENT || err != nil {
 		return err
 	}
-	copy(magic[:], ident[:4])
-	if n != 16 || string(ident[:4]) != ELFMAG {
-		return errors.New("bad magic number " + string(magic[:]) + " expected : " + ELFMAG)
+	copy(magic, ident[:4])
+	if n != 16 || string(magic) != ELFMAG {
+		return errors.New("bad magic number " + string(magic) + " expected : " + ELFMAG)
 	}
-	copy(p.F.Ident.Magic[:], ident[:4])
+	copy(p.F.Ident.Magic[:], magic)
 	p.F.Ident.Class = Class(ident[EI_CLASS])
 	switch p.F.Ident.Class {
 	case ELFCLASS32:
@@ -73,7 +73,6 @@ func (p *Parser) ParseIdent() error {
 	}
 	p.F.Ident.OSABI = OSABI(ident[EI_OSABI])
 	p.F.Ident.ABIVersion = ABIVersion(ident[EI_ABIVERSION])
-
 	// Read actual ELF Header
 	// Variables to keep track of the program header.
 	// var phoff int64
@@ -84,7 +83,7 @@ func (p *Parser) ParseIdent() error {
 	// var shentsize int
 	// var shnum int
 	// var shstrndx int
-	return p.parseRAWHeader(p.F.Ident.Class)
+	return p.ParseELFHeader(p.F.Ident.Class)
 }
 
 // CloseFile will close underlying mmap file
@@ -92,12 +91,12 @@ func (p *Parser) CloseFile() error {
 	return p.fs.Close()
 }
 
-// parseRAWELFHeader reads the raw elf header depending on the ELF Class (32 or 64).
-func (p *Parser) parseRAWHeader(c Class) error {
+// ParseELFHeader reads the raw elf header depending on the ELF Class (32 or 64).
+func (p *Parser) ParseELFHeader(c Class) error {
 
 	switch c {
 	case ELFCLASS32:
-		hdr := new(ELF32Header)
+		hdr := NewELF32Header()
 		n, err := p.fs.Seek(0, io.SeekStart)
 		if err != nil {
 			errString := fmt.Errorf(
@@ -109,11 +108,10 @@ func (p *Parser) parseRAWHeader(c Class) error {
 		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
 			return err
 		}
-		fmt.Println(hdr)
 		p.F.Header32 = hdr
 		return nil
 	case ELFCLASS64:
-		hdr := new(ELF64Header)
+		hdr := NewELF64Header()
 		n, err := p.fs.Seek(0, io.SeekStart)
 		if err != nil {
 			errString := fmt.Errorf(
@@ -125,7 +123,6 @@ func (p *Parser) parseRAWHeader(c Class) error {
 		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
 			return err
 		}
-		fmt.Println(hdr)
 		p.F.Header64 = hdr
 		return nil
 	default:

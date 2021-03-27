@@ -89,3 +89,13 @@ type ELF32Header struct {
 	Shnum     uint16   // Number of section header entries.
 	Shstrndx  uint16   // Section name strings section.
 }
+
+// NewELF32Header creates a new ELF 32-bit header.
+func NewELF32Header() *ELF32Header {
+	return &ELF32Header{}
+}
+
+// NewELF64Header creates a new ELF 64-bit header.
+func NewELF64Header() *ELF64Header {
+	return &ELF64Header{}
+}
