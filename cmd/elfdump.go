@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/saferwall/elf"
@@ -23,7 +24,16 @@ func main() {
 		fmt.Println("NOT AN ELF BINARY")
 		return
 	}
+	err = p.ParseELFHeader(p.F.Class())
+	if err != nil {
+		panic(err)
+	}
 	fmt.Printf("%v", p.F.Header64)
 	fmt.Println("VERY ELFY VERY COOL")
+	jsonHeader, err := json.MarshalIndent(p.F.Header64, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonHeader))
 
 }

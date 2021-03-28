@@ -50,3 +50,8 @@ type File struct {
 	Header32 *ELF32Header
 	Header64 *ELF64Header
 }
+
+// Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
+func (f *File) Class() Class {
+	return f.Ident.Class
+}

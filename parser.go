@@ -73,17 +73,7 @@ func (p *Parser) ParseIdent() error {
 	}
 	p.F.Ident.OSABI = OSABI(ident[EI_OSABI])
 	p.F.Ident.ABIVersion = ABIVersion(ident[EI_ABIVERSION])
-	// Read actual ELF Header
-	// Variables to keep track of the program header.
-	// var phoff int64
-	// var phentsize int
-	// var phnum int
-	// // Variables to keep track of the section header.
-	// var shoff int64
-	// var shentsize int
-	// var shnum int
-	// var shstrndx int
-	return p.ParseELFHeader(p.F.Ident.Class)
+	return nil
 }
 
 // CloseFile will close underlying mmap file
@@ -94,6 +84,16 @@ func (p *Parser) CloseFile() error {
 // ParseELFHeader reads the raw elf header depending on the ELF Class (32 or 64).
 func (p *Parser) ParseELFHeader(c Class) error {
 
+	// Because of parsing ambiguitiy we need parentheses here
+	// ref : https://golang.org/ref/spec#Composite_literals
+	// The two structs are comparable because all the fields are
+	// comparable values https://golang.org/ref/spec#Comparison_operators
+	if (FileIdent{} == p.F.Ident) {
+		err := p.ParseIdent()
+		if err != nil {
+			return err
+		}
+	}
 	switch c {
 	case ELFCLASS32:
 		hdr := NewELF32Header()
