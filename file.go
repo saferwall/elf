@@ -55,3 +55,8 @@ type File struct {
 func (f *File) Class() Class {
 	return f.Ident.Class
 }
+
+// IsELF64 returns true if the binary was compiled with an x64 architecture target.
+func (f *File) IsELF64() bool {
+	return f.Ident.Class == ELFCLASS64
+}
