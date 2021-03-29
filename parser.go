@@ -12,6 +12,7 @@ import (
 // Parser implements a parsing engine for the ELF file format.
 type Parser struct {
 	fs *binstream.FileStream
+	sr *io.SectionReader
 	F  *File
 }
 
@@ -155,6 +156,7 @@ func (p *Parser) ParseELFSectionHeader(c Class) error {
 		names[i] = sh.Name
 		sectionHeaders[i] = &sh
 		p.F.SectionHeaders = sectionHeaders
+		p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
 	}
 	return nil
 }
