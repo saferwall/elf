@@ -2,6 +2,7 @@ package elf
 
 import (
 	"encoding/binary"
+	"path"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestParser(t *testing.T) {
 			expectedIdent FileIdent
 		}{
 			{
-				path: "./test/ls",
+				path: path.Join("test/", "ls"),
 				expectedIdent: FileIdent{
 					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
 					Class:      ELFCLASS64,
@@ -48,7 +49,7 @@ func TestParser(t *testing.T) {
 			expectedHeader *ELF64Header
 		}{
 			{
-				path: "./test/ls",
+				path: path.Join("test/", "ls"),
 				expectedIdent: FileIdent{
 					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
 					Class:      ELFCLASS64,
@@ -102,7 +103,7 @@ func TestParser(t *testing.T) {
 			expectedSectionHeaders []*ELF64SectionHeader
 		}{
 			{
-				path: "test/ls",
+				path: path.Join("test/", "ls"),
 				expectedIdent: FileIdent{
 					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
 					Class:      ELFCLASS64,
