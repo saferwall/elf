@@ -15,7 +15,7 @@ func TestParser(t *testing.T) {
 			expectedIdent FileIdent
 		}{
 			{
-				path: "/bin/ls",
+				path: "./test/ls",
 				expectedIdent: FileIdent{
 					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
 					Class:      ELFCLASS64,
@@ -48,7 +48,7 @@ func TestParser(t *testing.T) {
 			expectedHeader *ELF64Header
 		}{
 			{
-				path: "/bin/ls",
+				path: "./test/ls",
 				expectedIdent: FileIdent{
 					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
 					Class:      ELFCLASS64,
