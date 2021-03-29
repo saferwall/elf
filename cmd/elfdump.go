@@ -28,7 +28,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v", p.F.Header64)
 	fmt.Println("VERY ELFY VERY COOL")
 	jsonHeader, err := json.MarshalIndent(p.F.Header64, "", "  ")
 	if err != nil {
@@ -36,4 +35,13 @@ func main() {
 	}
 	fmt.Println(string(jsonHeader))
 
+	err = p.ParseELFSectionHeader(elf.ELFCLASS64)
+	if err != nil {
+		panic(err)
+	}
+	jsonHeader, err = json.MarshalIndent(p.F.SectionHeaders, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonHeader))
 }

@@ -620,6 +620,7 @@ const (
 type SectionFlag uint32
 
 const (
+	SHF_NONE             SectionFlag = 0x0        // Undefined section flag
 	SHF_WRITE            SectionFlag = 0x1        // Section contains writable data.
 	SHF_ALLOC            SectionFlag = 0x2        // Section occupies memory.
 	SHF_EXECINSTR        SectionFlag = 0x4        // Section contains instructions.
