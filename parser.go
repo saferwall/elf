@@ -106,7 +106,7 @@ func (p *Parser) ParseELFHeader(c Class) error {
 			)
 			return errors.New(errString.Error())
 		}
-		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
+		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, &hdr); err != nil {
 			return err
 		}
 		p.F.Header32 = hdr
@@ -121,7 +121,7 @@ func (p *Parser) ParseELFHeader(c Class) error {
 			)
 			return errors.New(errString.Error())
 		}
-		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, hdr); err != nil {
+		if err := binary.Read(p.fs, p.F.Ident.ByteOrder, &hdr); err != nil {
 			return err
 		}
 		p.F.Header64 = hdr
@@ -133,17 +133,21 @@ func (p *Parser) ParseELFHeader(c Class) error {
 
 // ParseELFSectionHeader reads the raw elf section header.
 func (p *Parser) ParseELFSectionHeader(c Class) error {
-	if p.F.Header64 == nil {
+	if p.F.Header64 == NewELF64Header() {
 		return errors.New("header need to be parsed first")
 	}
 	if p.F.Header64.Shnum == 0 || p.F.Header64.Shoff == 0 {
 		return errors.New("ELF file doesn't contain any section header table")
 	}
-	names := make([]uint32, p.F.Header64.Shnum)
-	sectionHeaders := make([]*ELF64SectionHeader, p.F.Header64.Shnum)
-	for i := 0; uint16(i) < p.F.Header64.Shnum; i++ {
+	shnum := p.F.Header64.SectionHeadersNum()
+	shoff := p.F.Header64.SectionHeadersOffset()
+	shentz := p.F.Header64.Shentsize
+
+	names := make([]uint32, shnum)
+	sectionHeaders := make([]ELF64SectionHeader, shnum)
+	for i := 0; uint16(i) < shnum; i++ {
 		// Section index 0, and indices in the range 0xFF00–0xFFFF are reserved for special purposes.
-		offset := int64(p.F.Header64.Shoff) + int64(i)*int64(p.F.Header64.Shentsize)
+		offset := int64(shoff) + int64(i)*int64(shentz)
 		_, err := p.fs.Seek(offset, io.SeekStart)
 		if err != nil {
 			return err
@@ -154,7 +158,7 @@ func (p *Parser) ParseELFSectionHeader(c Class) error {
 			return err
 		}
 		names[i] = sh.Name
-		sectionHeaders[i] = &sh
+		sectionHeaders[i] = sh
 		p.F.SectionHeaders = sectionHeaders
 		p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
 	}

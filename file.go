@@ -47,9 +47,9 @@ type ProgramHeaderTable struct{}
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
 	Ident          FileIdent
-	Header32       *ELF32Header
-	Header64       *ELF64Header
-	SectionHeaders []*ELF64SectionHeader
+	Header32       ELF32Header
+	Header64       ELF64Header
+	SectionHeaders []ELF64SectionHeader
 }
 
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)

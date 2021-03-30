@@ -100,7 +100,7 @@ func TestParser(t *testing.T) {
 			path                   string
 			expectedIdent          FileIdent
 			expectedHeader         *ELF64Header
-			expectedSectionHeaders []*ELF64SectionHeader
+			expectedSectionHeaders []ELF64SectionHeader
 		}{
 			{
 				path: path.Join("test/", "ls"),
@@ -129,7 +129,7 @@ func TestParser(t *testing.T) {
 					Shnum:     30,
 					Shstrndx:  29,
 				},
-				expectedSectionHeaders: []*ELF64SectionHeader{
+				expectedSectionHeaders: []ELF64SectionHeader{
 					{
 						Name:      0,
 						Type:      0,
