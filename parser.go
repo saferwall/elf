@@ -136,7 +136,35 @@ func (p *Parser) ParseELFSectionHeader(c Class) error {
 
 	switch c {
 	case ELFCLASS32:
-		return nil
+		if p.F.Header32 == NewELF32Header() {
+			return errors.New("header need to be parsed first")
+		}
+		if p.F.Header32.Shnum == 0 || p.F.Header32.Shoff == 0 {
+			return errors.New("ELF file doesn't contain any section header table")
+		}
+		shnum := p.F.Header32.SectionHeadersNum()
+		shoff := p.F.Header32.SectionHeadersOffset()
+		shentz := p.F.Header32.Shentsize
+
+		names := make([]uint32, shnum)
+		sectionHeaders := make([]ELF32SectionHeader, shnum)
+		for i := 0; uint16(i) < shnum; i++ {
+			// Section index 0, and indices in the range 0xFF00–0xFFFF are reserved for special purposes.
+			offset := int64(shoff) + int64(i)*int64(shentz)
+			_, err := p.fs.Seek(offset, io.SeekStart)
+			if err != nil {
+				return err
+			}
+			// section header file offset
+			var sh ELF32SectionHeader
+			if err := binary.Read(p.fs, p.F.Ident.ByteOrder, &sh); err != nil {
+				return err
+			}
+			names[i] = sh.Name
+			sectionHeaders[i] = sh
+			p.F.SectionHeaders32 = sectionHeaders
+			p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
+		}
 	case ELFCLASS64:
 		if p.F.Header64 == NewELF64Header() {
 			return errors.New("header need to be parsed first")
@@ -164,7 +192,7 @@ func (p *Parser) ParseELFSectionHeader(c Class) error {
 			}
 			names[i] = sh.Name
 			sectionHeaders[i] = sh
-			p.F.SectionHeaders = sectionHeaders
+			p.F.SectionHeaders64 = sectionHeaders
 			p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
 		}
 	}

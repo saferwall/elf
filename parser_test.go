@@ -10,35 +10,42 @@ import (
 
 // Run Tests against readelf output on /bin/ls.
 func TestParser(t *testing.T) {
-	t.Run("TestParseIdent", func(t *testing.T) {
+	t.Run("TestELFStructs", func(t *testing.T) {
 		testCases := []struct {
-			path          string
-			expectedIdent FileIdent
+			ELFHeader32         ELF32Header
+			expectedELFHeader32 ELF32Header
+			ELFHeader64         ELF64Header
+			expectedELFHeader64 ELF64Header
 		}{
 			{
-				path: path.Join("test/", "ls"),
-				expectedIdent: FileIdent{
-					Magic:      [4]byte{0x7f, 'E', 'L', 'F'},
-					Class:      ELFCLASS64,
-					Data:       ELFDATA2LSB,
-					Version:    EV_CURRENT,
-					OSABI:      ELFOSABI_NONE,
-					ABIVersion: ELFABIVersion_CURRENT,
-					ByteOrder:  binary.LittleEndian,
+				ELFHeader32:         NewELF32Header(),
+				expectedELFHeader32: ELF32Header{Ident: [16]byte{}, Type: 0, Machine: 0, Version: 0, Entry: 0, Phoff: 0, Shoff: 0, Flags: 0, Ehsize: 0, Phentsize: 0, Phnum: 0, Shentsize: 0, Shnum: 0, Shstrndx: 0},
+				ELFHeader64:         NewELF64Header(),
+				expectedELFHeader64: ELF64Header{
+					Ident:     [16]byte{},
+					Type:      0,
+					Machine:   0,
+					Version:   0,
+					Entry:     0,
+					Phoff:     0,
+					Shoff:     0,
+					Flags:     0,
+					Ehsize:    0,
+					Phentsize: 0,
+					Phnum:     0,
+					Shentsize: 0,
+					Shnum:     0,
+					Shstrndx:  0,
 				},
 			},
 		}
-
 		for _, tt := range testCases {
-			p, err := New(tt.path)
-			if err != nil {
-				t.Fatal("failed to create new parser with error :", err)
+			if !assert.EqualValues(t, tt.expectedELFHeader32, tt.ELFHeader32) {
+				t.Fatal("failed to assert empty ELF structs")
 			}
-			err = p.ParseIdent()
-			if err != nil {
-				t.Fatal("failed to parse ident with error :", err)
+			if !assert.EqualValues(t, tt.expectedELFHeader64, tt.ELFHeader64) {
+				t.Fatal("failed to assert empty ELF structs")
 			}
-			assert.EqualValues(t, tt.expectedIdent, p.F.Ident, "expected ident equal")
 		}
 
 	})
@@ -95,12 +102,12 @@ func TestParser(t *testing.T) {
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
 		}
 	})
-	t.Run("TestParseSectionHeaders", func(t *testing.T) {
+	t.Run("TestParseSectionHeader64", func(t *testing.T) {
 		testCases := []struct {
-			path                   string
-			expectedIdent          FileIdent
-			expectedHeader         ELF64Header
-			expectedSectionHeaders []ELF64SectionHeader
+			path                    string
+			expectedIdent           FileIdent
+			expectedHeader          ELF64Header
+			expectedSectionHeader64 []ELF64SectionHeader
 		}{
 			{
 				path: path.Join("test/", "ls"),
@@ -129,7 +136,7 @@ func TestParser(t *testing.T) {
 					Shnum:     30,
 					Shstrndx:  29,
 				},
-				expectedSectionHeaders: []ELF64SectionHeader{
+				expectedSectionHeader64: []ELF64SectionHeader{
 					{
 						Name:      0,
 						Type:      0,
@@ -484,7 +491,7 @@ func TestParser(t *testing.T) {
 			if err != nil {
 				t.Fatal("failed to parse ELF section headers with error :", err)
 			}
-			assert.EqualValues(t, tt.expectedSectionHeaders, p.F.SectionHeaders, "expected section headers equal")
+			assert.EqualValues(t, tt.expectedSectionHeader64, p.F.SectionHeaders64, "expected section headers equal")
 		}
 	})
 }

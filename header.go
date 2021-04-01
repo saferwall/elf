@@ -76,7 +76,7 @@ type ELF64SectionHeader struct {
 type ELF32SectionHeader struct {
 	Name      uint32 // Section name index in the Section Header String Table.
 	Type      uint32 // Section type.
-	Flags     uint64 // Section flags.
+	Flags     uint32 // Section flags.
 	Addr      uint32 // Virtual address in memory.
 	Off       uint32 // Offset in file.
 	Size      uint32 // Section size in bytes.
@@ -150,8 +150,8 @@ func (h ELF32Header) SectionHeadersEntSize() uint16 {
 }
 
 // Size returns the ELF Header size in bytes.
-func (h ELF32Header) Size() uint64 {
-	return uint64(h.Ehsize)
+func (h ELF32Header) Size() uint16 {
+	return h.Ehsize
 }
 
 // NewELF64Header creates a new ELF 64-bit header.
@@ -200,6 +200,6 @@ func (h ELF64Header) SectionHeadersEntSize() uint16 {
 }
 
 // Size returns the ELF Header size in bytes.
-func (h ELF64Header) Size() uint64 {
-	return uint64(h.Ehsize)
+func (h ELF64Header) Size() uint16 {
+	return h.Ehsize
 }
