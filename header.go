@@ -72,6 +72,20 @@ type ELF64SectionHeader struct {
 	EntSize   uint64 // Size of each entry in the section.
 }
 
+// ELF64SectionHeader represents the section header of ELF 64-bit binaries.
+type ELF32SectionHeader struct {
+	Name      uint32 // Section name index in the Section Header String Table.
+	Type      uint32 // Section type.
+	Flags     uint64 // Section flags.
+	Addr      uint32 // Virtual address in memory.
+	Off       uint32 // Offset in file.
+	Size      uint32 // Section size in bytes.
+	Link      uint32 // Index of a related section.
+	Info      uint32 // Miscellaneous information depends on section type.
+	AddrAlign uint32 // Address alignment boundary.
+	EntSize   uint32 // Size of each entry in the section.
+}
+
 // ELF32Header represents the executable header of the ELF file format for (32-bit architecture).
 type ELF32Header struct {
 	Ident     [16]byte // File identification.
@@ -93,6 +107,51 @@ type ELF32Header struct {
 // NewELF32Header creates a new ELF 32-bit header.
 func NewELF32Header() ELF32Header {
 	return ELF32Header{}
+}
+
+// GetIdent returns identifier array EI_IDENT.
+func (h ELF32Header) GetIdent() [EI_NIDENT]byte {
+	return h.Ident
+}
+
+// GetType returns file type.
+func (h ELF32Header) GetType() uint16 {
+	return h.Type
+}
+
+// GetMachine returns ELF target machine.
+func (h ELF32Header) GetMachine() uint16 {
+	return h.Machine
+}
+
+// GetEntry returns entrypoint (virtual address) of ELF binary.
+func (h ELF32Header) GetEntry() uint32 {
+	return h.Entry
+}
+
+// ProgramHeadersOffset returns the file offset to the program headers.
+func (h ELF32Header) ProgramHeadersOffset() uint32 {
+	return h.Phoff
+}
+
+// SectionHeadersOffset returns the file offset to the section headers.
+func (h ELF32Header) SectionHeadersOffset() uint32 {
+	return h.Shoff
+}
+
+// SectionHeadersNum returns the number of section headers is in the section headers table.
+func (h ELF32Header) SectionHeadersNum() uint16 {
+	return h.Shnum
+}
+
+// SectionHeadersEntSize returns the size of a section headers entry
+func (h ELF32Header) SectionHeadersEntSize() uint16 {
+	return h.Shentsize
+}
+
+// Size returns the ELF Header size in bytes.
+func (h ELF32Header) Size() uint64 {
+	return uint64(h.Ehsize)
 }
 
 // NewELF64Header creates a new ELF 64-bit header.

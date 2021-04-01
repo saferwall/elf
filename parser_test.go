@@ -46,7 +46,7 @@ func TestParser(t *testing.T) {
 		testCases := []struct {
 			path           string
 			expectedIdent  FileIdent
-			expectedHeader *ELF64Header
+			expectedHeader ELF64Header
 		}{
 			{
 				path: path.Join("test/", "ls"),
@@ -59,7 +59,7 @@ func TestParser(t *testing.T) {
 					ABIVersion: ELFABIVersion_CURRENT,
 					ByteOrder:  binary.LittleEndian,
 				},
-				expectedHeader: &ELF64Header{
+				expectedHeader: ELF64Header{
 					Ident:     [16]byte{0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					Type:      uint16(ET_DYN),
 					Machine:   uint16(EM_X86_64),
@@ -99,7 +99,7 @@ func TestParser(t *testing.T) {
 		testCases := []struct {
 			path                   string
 			expectedIdent          FileIdent
-			expectedHeader         *ELF64Header
+			expectedHeader         ELF64Header
 			expectedSectionHeaders []ELF64SectionHeader
 		}{
 			{
@@ -113,7 +113,7 @@ func TestParser(t *testing.T) {
 					ABIVersion: ELFABIVersion_CURRENT,
 					ByteOrder:  binary.LittleEndian,
 				},
-				expectedHeader: &ELF64Header{
+				expectedHeader: ELF64Header{
 					Ident:     [16]byte{0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 					Type:      uint16(ET_DYN),
 					Machine:   uint16(EM_X86_64),
