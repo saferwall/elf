@@ -3,6 +3,8 @@
 // https://refspecs.linuxbase.org/elf/elf.pdf
 package elf
 
+import "encoding/binary"
+
 // Indexes in Ident array.
 const (
 	EI_MAG0       = 0  // Start of magic bytes 0x7f
@@ -696,3 +698,44 @@ const (
 	PF_MASKOS   ProgFlag = 0x0ff00000 // Operating system-specific.
 	PF_MASKPROC ProgFlag = 0xf0000000 // Processor-specific.
 )
+
+// IsValidELFClass validates the ELF class of the binary.
+func IsValidELFClass(c Class) bool {
+	switch c {
+	case ELFCLASS32:
+		return true
+	case ELFCLASS64:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsValidByteOrder validates the ELF byte order field.
+func IsValidByteOrder(b Data) bool {
+	switch b {
+	case ELFDATA2LSB:
+		return true
+	case ELFDATA2MSB:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsValidVersion validates against the current default version flag EV_CURRENT.
+func IsValidVersion(b Version) bool {
+	return b == EV_CURRENT
+}
+
+// goByteOrder encodes a Data field to a native Go byte order field.
+func ByteOrder(b Data) binary.ByteOrder {
+	switch b {
+	case ELFDATA2LSB:
+		return binary.LittleEndian
+	case ELFDATA2MSB:
+		return binary.BigEndian
+	default:
+		return binary.LittleEndian
+	}
+}

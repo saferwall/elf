@@ -39,7 +39,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	jsonHeader, err = json.MarshalIndent(p.F.SectionHeaders, "", "  ")
+	jsonHeader, err = json.MarshalIndent(p.F.SectionHeaders64, "", "  ")
 	if err != nil {
 		panic(err)
 	}
