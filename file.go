@@ -51,6 +51,8 @@ type File struct {
 	Header64         ELF64Header
 	SectionHeaders32 []ELF32SectionHeader
 	SectionHeaders64 []ELF64SectionHeader
+	Sections32       []*ELFSection32
+	Sections64       []*ELFSection64
 }
 
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
@@ -61,4 +63,23 @@ func (f *File) Class() Class {
 // IsELF64 returns true if the binary was compiled with an x64 architecture target.
 func (f *File) IsELF64() bool {
 	return f.Ident.Class == ELFCLASS64
+}
+
+// SectionNames returns the list of section names
+func (f *File) SectionNames() []string {
+	if len(f.Sections64) != 0 {
+		sectionNames := make([]string, len(f.Sections64))
+		for i, s := range f.Sections64 {
+			sectionNames[i] = s.SectionName
+		}
+		return sectionNames
+	} else if len(f.Sections32) != 0 {
+		sectionNames := make([]string, len(f.Sections64))
+		for i, s := range f.Sections32 {
+			sectionNames[i] = s.SectionName
+		}
+		return sectionNames
+	}
+
+	return []string{""}
 }

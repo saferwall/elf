@@ -12,7 +12,6 @@ import (
 // Parser implements a parsing engine for the ELF file format.
 type Parser struct {
 	fs *binstream.FileStream
-	sr *io.SectionReader
 	F  *File
 }
 
@@ -179,7 +178,6 @@ func (p *Parser) parseELFSectionHeader32() error {
 		names[i] = sh.Name
 		sectionHeaders[i] = sh
 		p.F.SectionHeaders32 = sectionHeaders
-		p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
 	}
 	return nil
 }
@@ -213,7 +211,121 @@ func (p *Parser) parseELFSectionHeader64() error {
 		names[i] = sh.Name
 		sectionHeaders[i] = sh
 		p.F.SectionHeaders64 = sectionHeaders
-		p.sr = io.NewSectionReader(p.fs, int64(sh.Off), int64(sh.Size))
 	}
+	return nil
+}
+
+// getString extracts a string from an ELF string table.
+func getString(section []byte, start int) (string, bool) {
+	if start < 0 || start >= len(section) {
+		return "", false
+	}
+	for end := start; end < len(section); end++ {
+		if section[end] == 0 {
+			return string(section[start:end]), true
+		}
+	}
+	return "", false
+}
+
+// parseELFSections64 parses all sections in a 64-bit ELF binary.
+func (p *Parser) parseELFSections64() error {
+	if len(p.F.SectionHeaders64) == 0 {
+		err := p.parseELFSectionHeader64()
+		if err != nil {
+			return err
+		}
+	}
+	shnum := p.F.Header64.Shnum
+	sections := make([]*ELFSection64, shnum)
+
+	for i := 0; i < int(shnum); i++ {
+		s := &ELFSection64{}
+		size := p.F.SectionHeaders64[i].Size
+		s.ELF64SectionHeader = p.F.SectionHeaders64[i]
+		s.sr = io.NewSectionReader(p.fs, int64(s.Off), int64(size))
+
+		if s.Flags&uint64(SHF_COMPRESSED) == 0 {
+			s.Size = p.F.SectionHeaders64[i].Size
+		} else {
+			ch := new(ELF64CompressionHeader)
+			err := binary.Read(s.sr, p.F.Ident.ByteOrder, ch)
+			if err != nil {
+				return errors.New("error reading compressed header " + err.Error())
+			}
+			s.compressionType = CompressionType(ch.Type)
+			s.Size = ch.Size
+			s.AddrAlign = ch.AddrAlign
+			s.compressionOffset = int64(binary.Size(ch))
+		}
+		sections[i] = s
+	}
+	if len(sections) == 0 {
+		return errors.New("binary has no sections")
+	}
+	shstrtab, err := sections[p.F.Header64.Shstrndx].Data()
+	if err != nil {
+		return errors.New("error reading the section header strings table " + err.Error())
+	}
+
+	for i, s := range sections {
+		var ok bool
+		s.SectionName, ok = getString(shstrtab, int(p.F.SectionHeaders64[i].Name))
+		if !ok {
+			return errors.New("failed to parse string table")
+		}
+	}
+	p.F.Sections64 = sections
+	return nil
+}
+
+// parseELFSections32 parses all sections in a 32-bit ELF binary.
+func (p *Parser) parseELFSections32() error {
+	if len(p.F.SectionHeaders32) == 0 {
+		err := p.parseELFSectionHeader32()
+		if err != nil {
+			return err
+		}
+	}
+	shnum := p.F.Header32.Shnum
+	sections := make([]*ELFSection32, shnum)
+
+	for i := 0; i < int(shnum); i++ {
+		s := &ELFSection32{}
+		size := p.F.SectionHeaders32[i].Size
+		s.ELF32SectionHeader = p.F.SectionHeaders32[i]
+		s.sr = io.NewSectionReader(p.fs, int64(s.Off), int64(size))
+
+		if s.Flags&uint32(SHF_COMPRESSED) == 0 {
+			s.Size = p.F.SectionHeaders32[i].Size
+		} else {
+			ch := new(ELF32CompressionHeader)
+			err := binary.Read(s.sr, p.F.Ident.ByteOrder, ch)
+			if err != nil {
+				return errors.New("error reading compressed header " + err.Error())
+			}
+			s.compressionType = CompressionType(ch.Type)
+			s.Size = ch.Size
+			s.AddrAlign = ch.AddrAlign
+			s.compressionOffset = int64(binary.Size(ch))
+		}
+		sections[i] = s
+	}
+	if len(sections) == 0 {
+		return errors.New("binary has no sections")
+	}
+	shstrtab, err := sections[p.F.Header64.Shstrndx].Data()
+	if err != nil {
+		return errors.New("error reading the section header strings table " + err.Error())
+	}
+
+	for i, s := range sections {
+		var ok bool
+		s.SectionName, ok = getString(shstrtab, int(p.F.SectionHeaders64[i].Name))
+		if !ok {
+			return errors.New("failed to parse string table")
+		}
+	}
+	p.F.Sections32 = sections
 	return nil
 }
