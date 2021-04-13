@@ -649,21 +649,6 @@ const (
 	COMPRESS_HIPROC CompressionType = 0x7fffffff // Last processor-specific type.
 )
 
-// ELF64CompressionHeader defines the compression info of the section.
-type ELF64CompressionHeader struct {
-	Type      uint32
-	_         uint32 // Reserved
-	Size      uint64
-	AddrAlign uint64
-}
-
-// ELF32 Compression header.
-type ELF32CompressionHeader struct {
-	Type      uint32
-	Size      uint32
-	AddrAlign uint32
-}
-
 // Prog.Type
 type ProgType int
 

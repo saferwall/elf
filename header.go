@@ -58,34 +58,6 @@ type ELF64Header struct {
 	Shstrndx  uint16   // Section name strings section.
 }
 
-// ELF64SectionHeader represents the section header of ELF 64-bit binaries.
-type ELF64SectionHeader struct {
-	Name      uint32 // Section name index in the Section Header String Table.
-	Type      uint32 // Section type.
-	Flags     uint64 // Section flags.
-	Addr      uint64 // Virtual address in memory.
-	Off       uint64 // Offset in file.
-	Size      uint64 // Section size in bytes.
-	Link      uint32 // Index of a related section.
-	Info      uint32 // Miscellaneous information depends on section type.
-	AddrAlign uint64 // Address alignment boundary.
-	EntSize   uint64 // Size of each entry in the section.
-}
-
-// ELF64SectionHeader represents the section header of ELF 64-bit binaries.
-type ELF32SectionHeader struct {
-	Name      uint32 // Section name index in the Section Header String Table.
-	Type      uint32 // Section type.
-	Flags     uint32 // Section flags.
-	Addr      uint32 // Virtual address in memory.
-	Off       uint32 // Offset in file.
-	Size      uint32 // Section size in bytes.
-	Link      uint32 // Index of a related section.
-	Info      uint32 // Miscellaneous information depends on section type.
-	AddrAlign uint32 // Address alignment boundary.
-	EntSize   uint32 // Size of each entry in the section.
-}
-
 // ELF32Header represents the executable header of the ELF file format for (32-bit architecture).
 type ELF32Header struct {
 	Ident     [16]byte // File identification.

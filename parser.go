@@ -329,3 +329,24 @@ func (p *Parser) parseELFSections32() error {
 	p.F.Sections32 = sections
 	return nil
 }
+
+// parseELFProgramHeader64 parses all program header table entries in a 64-bit ELF binary.
+func (p *Parser) parseELFProgramHeader64() error {
+	phOff := p.F.Header64.Phoff
+	phNum := p.F.Header64.Phnum
+	phEntSize := p.F.Header64.Phentsize
+	programHeaders := make([]ELF64ProgramHeader64, phNum)
+
+	for i := 0; i < int(phNum); i++ {
+		off := int64(phOff) + int64(i)*int64(phEntSize)
+		p.fs.Seek(off, io.SeekStart)
+		var ph ELF64ProgramHeader64
+		err := binary.Read(p.fs, p.F.Ident.ByteOrder, &ph)
+		if err != nil {
+			return err
+		}
+		programHeaders[i] = ph
+	}
+	p.F.ProgramHeader64 = programHeaders
+	return nil
+}
