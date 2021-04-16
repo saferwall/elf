@@ -929,7 +929,7 @@ func TestParser(t *testing.T) {
 			path                       string
 			expectedIdent              FileIdent
 			expectedHeader             ELF64Header
-			expectedProgramHeaders     []ELF64ProgramHeader64
+			expectedProgramHeaders     []ELF64ProgramHeader
 			expectedProgramHeaderCount int
 		}{
 			{
@@ -959,7 +959,7 @@ func TestParser(t *testing.T) {
 					Shnum:     30,
 					Shstrndx:  29,
 				},
-				expectedProgramHeaders: []ELF64ProgramHeader64{
+				expectedProgramHeaders: []ELF64ProgramHeader{
 
 					{
 						Type:   uint32(PT_PHDR),
@@ -1104,8 +1104,8 @@ func TestParser(t *testing.T) {
 			if err != nil {
 				t.Fatal("failed to parse ELF program headers with error :", err)
 			}
-			assert.EqualValues(t, tt.expectedProgramHeaders, p.F.ProgramHeader64)
-			assert.EqualValues(t, tt.expectedProgramHeaderCount, len(p.F.ProgramHeader64))
+			assert.EqualValues(t, tt.expectedProgramHeaders, p.F.ProgramHeaders64)
+			assert.EqualValues(t, tt.expectedProgramHeaderCount, len(p.F.ProgramHeaders64))
 		}
 	})
 }

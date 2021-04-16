@@ -51,7 +51,8 @@ type File struct {
 	Header64         ELF64Header
 	SectionHeaders32 []ELF32SectionHeader
 	SectionHeaders64 []ELF64SectionHeader
-	ProgramHeader64  []ELF64ProgramHeader64
+	ProgramHeaders32 []ELF32ProgramHeader
+	ProgramHeaders64 []ELF64ProgramHeader
 	Sections32       []*ELFSection32
 	Sections64       []*ELFSection64
 }
