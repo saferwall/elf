@@ -1,5 +1,7 @@
 package elf
 
+import "debug/elf"
+
 // NewELF32Header creates a new ELF 32-bit header.
 func NewELF32Header() ELF32Header {
 	return ELF32Header{}
@@ -56,7 +58,7 @@ func NewELF64Header() ELF64Header {
 }
 
 // GetIdent returns identifier array EI_IDENT.
-func (h ELF64Header) GetIdent() [EI_NIDENT]byte {
+func (h ELF64Header) GetIdent() [elf.EI_NIDENT]byte {
 	return h.Ident
 }
 

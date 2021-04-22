@@ -18,17 +18,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	magic := p.F.Ident.Magic.String()
-
-	if magic != elf.ELFMAG {
-		fmt.Println("NOT AN ELF BINARY")
-		return
-	}
 	err = p.ParseELFHeader(p.F.Class())
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("VERY ELFY VERY COOL")
 	jsonHeader, err := json.MarshalIndent(p.F.Header64, "", "  ")
 	if err != nil {
 		panic(err)
