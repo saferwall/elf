@@ -11,7 +11,7 @@ import (
 
 // Parser implements a parsing engine for the ELF file format.
 type Parser struct {
-	fs *binstream.FileStream
+	fs binstream.Stream
 	F  *File
 }
 
@@ -28,9 +28,22 @@ func New(filename string) (*Parser, error) {
 	return p, nil
 }
 
+// NewBytes creates a new instance of parser from a byte slice representig the ELF binary.
+func NewBytes(data []byte) (*Parser, error) {
+	fs, err := binstream.NewByteStream(data)
+	if err != nil {
+		return nil, err
+	}
+	p := &Parser{
+		fs: fs,
+		F:  &File{},
+	}
+	return p, nil
+}
+
 // Parse will parse the entire ELF file.
-func (p *Parser) Parse() (*Parser, error) {
-	return nil, nil
+func (p *Parser) Parse() error {
+	return nil
 }
 
 // ParseIdent will parse the identification bytes at the start of the ELF File.
