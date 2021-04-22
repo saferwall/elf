@@ -53,8 +53,8 @@ type File struct {
 	SectionHeaders64 []ELF64SectionHeader
 	ProgramHeaders32 []ELF32ProgramHeader
 	ProgramHeaders64 []ELF64ProgramHeader
-	Sections32       []*ELFSection32
-	Sections64       []*ELFSection64
+	Sections32       []*ELF32Section
+	Sections64       []*ELF64Section
 }
 
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
@@ -84,4 +84,45 @@ func (f *File) SectionNames() []string {
 	}
 
 	return []string{""}
+}
+
+// IsValidELFClass validates the ELF class of the binary.
+func IsValidELFClass(c Class) bool {
+	switch c {
+	case ELFCLASS32:
+		return true
+	case ELFCLASS64:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsValidByteOrder validates the ELF byte order field.
+func IsValidByteOrder(b Data) bool {
+	switch b {
+	case ELFDATA2LSB:
+		return true
+	case ELFDATA2MSB:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsValidVersion validates against the current default version flag EV_CURRENT.
+func IsValidVersion(b Version) bool {
+	return b == EV_CURRENT
+}
+
+// goByteOrder encodes a Data field to a native Go byte order field.
+func ByteOrder(b Data) binary.ByteOrder {
+	switch b {
+	case ELFDATA2LSB:
+		return binary.LittleEndian
+	case ELFDATA2MSB:
+		return binary.BigEndian
+	default:
+		return binary.LittleEndian
+	}
 }

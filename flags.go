@@ -1,9 +1,7 @@
-// Package elf implements a parser for ELF binaries.
+// Package elf : flags.go implements a parser for ELF binaries.
 // The current file documents the flags as defined in :
 // https://refspecs.linuxbase.org/elf/elf.pdf
 package elf
-
-import "encoding/binary"
 
 // Indexes in Ident array.
 const (
@@ -583,6 +581,18 @@ const (
 	SHN_HIRESERVE SectionIndex = 0xffff // Last of reserved range.
 )
 
+var sectionIndexStrings = []flagName{
+	{0, "SHN_UNDEF"},
+	{0xff00, "SHN_LOPROC"},
+	{0xff20, "SHN_LOOS"},
+	{0xfff1, "SHN_ABS"},
+	{0xfff2, "SHN_COMMON"},
+	{0xffff, "SHN_XINDEX"},
+}
+
+func (si SectionIndex) String() string   { return stringify(uint32(si), sectionIndexStrings, false) }
+func (si SectionIndex) GoString() string { return stringify(uint32(si), sectionIndexStrings, true) }
+
 // Section type.
 type SectionType uint32
 
@@ -618,6 +628,40 @@ const (
 	SHT_HIUSER         SectionType = 0xffffffff // specific indexes
 )
 
+var sectionTypeStrings = []flagName{
+	{0, "SHT_NULL"},
+	{1, "SHT_PROGBITS"},
+	{2, "SHT_SYMTAB"},
+	{3, "SHT_STRTAB"},
+	{4, "SHT_RELA"},
+	{5, "SHT_HASH"},
+	{6, "SHT_DYNAMIC"},
+	{7, "SHT_NOTE"},
+	{8, "SHT_NOBITS"},
+	{9, "SHT_REL"},
+	{10, "SHT_SHLIB"},
+	{11, "SHT_DYNSYM"},
+	{14, "SHT_INIT_ARRAY"},
+	{15, "SHT_FINI_ARRAY"},
+	{16, "SHT_PREINIT_ARRAY"},
+	{17, "SHT_GROUP"},
+	{18, "SHT_SYMTAB_SHNDX"},
+	{0x60000000, "SHT_LOOS"},
+	{0x6ffffff5, "SHT_GNU_ATTRIBUTES"},
+	{0x6ffffff6, "SHT_GNU_HASH"},
+	{0x6ffffff7, "SHT_GNU_LIBLIST"},
+	{0x6ffffffd, "SHT_GNU_VERDEF"},
+	{0x6ffffffe, "SHT_GNU_VERNEED"},
+	{0x6fffffff, "SHT_GNU_VERSYM"},
+	{0x70000000, "SHT_LOPROC"},
+	{0x7fffffff, "SHT_HIPROC"},
+	{0x80000000, "SHT_LOUSER"},
+	{0xffffffff, "SHT_HIUSER"},
+}
+
+func (st SectionType) String() string   { return stringify(uint32(st), sectionTypeStrings, false) }
+func (st SectionType) GoString() string { return stringify(uint32(st), sectionTypeStrings, true) }
+
 // Section flags.
 type SectionFlag uint32
 
@@ -638,6 +682,23 @@ const (
 	SHF_MASKPROC         SectionFlag = 0xf0000000 // Processor-specific semantics.
 )
 
+var sectionFlagStrings = []flagName{
+	{0x1, "SHF_WRITE"},
+	{0x2, "SHF_ALLOC"},
+	{0x4, "SHF_EXECINSTR"},
+	{0x10, "SHF_MERGE"},
+	{0x20, "SHF_STRINGS"},
+	{0x40, "SHF_INFO_LINK"},
+	{0x80, "SHF_LINK_ORDER"},
+	{0x100, "SHF_OS_NONCONFORMING"},
+	{0x200, "SHF_GROUP"},
+	{0x400, "SHF_TLS"},
+	{0x800, "SHF_COMPRESSED"},
+}
+
+func (sf SectionFlag) String() string   { return matchFlagName(uint32(sf), sectionFlagStrings, false) }
+func (sf SectionFlag) GoString() string { return matchFlagName(uint32(sf), sectionFlagStrings, true) }
+
 // Section compression type.
 type CompressionType int
 
@@ -648,6 +709,17 @@ const (
 	COMPRESS_LOPROC CompressionType = 0x70000000 // First processor-specific type.
 	COMPRESS_HIPROC CompressionType = 0x7fffffff // Last processor-specific type.
 )
+
+var compressionStrings = []flagName{
+	{0, "COMPRESS_ZLIB"},
+	{0x60000000, "COMPRESS_LOOS"},
+	{0x6fffffff, "COMPRESS_HIOS"},
+	{0x70000000, "COMPRESS_LOPROC"},
+	{0x7fffffff, "COMPRESS_HIPROC"},
+}
+
+func (ct CompressionType) String() string   { return stringify(uint32(ct), compressionStrings, false) }
+func (ct CompressionType) GoString() string { return stringify(uint32(ct), compressionStrings, true) }
 
 // Prog.Type
 type ProgType int
@@ -688,6 +760,35 @@ const (
 	PT_HIPROC            ProgType = 0x7fffffff // Last processor-specific type.
 )
 
+var programTypeStrings = []flagName{
+	{0, "PT_NULL"},
+	{1, "PT_LOAD"},
+	{2, "PT_DYNAMIC"},
+	{3, "PT_INTERP"},
+	{4, "PT_NOTE"},
+	{5, "PT_SHLIB"},
+	{6, "PT_PHDR"},
+	{7, "PT_TLS"},
+	{0x60000000, "PT_LOOS"},
+	{0x6474e550, "PT_GNU_EH_FRAME"},
+	{0x6474e551, "PT_GNU_STACK"},
+	{0x6474e552, "PT_GNU_RELRO"},
+	{0x6474e553, "PT_GNU_PROPERTY"},
+	{0x65041580, "PT_PAX_FLAGS"},
+	{0x65a3dbe6, "PT_OPENBSD_RANDOMIZE"},
+	{0x65a3dbe7, "PT_OPENBSD_WXNEEDED"},
+	{0x65a41be6, "PT_OPENBSD_BOOTDATA"},
+	{0x6ffffffb, "PT_SUNWSTACK"},
+	{0x6fffffff, "PT_HIOS"},
+	{0x70000000, "PT_LOPROC"},
+	// We don't list the processor-dependent ProgTypes,
+	// as the values overlap.
+	{0x7fffffff, "PT_HIPROC"},
+}
+
+func (pt ProgType) String() string   { return stringify(uint32(pt), programTypeStrings, false) }
+func (pt ProgType) GoString() string { return stringify(uint32(pt), programTypeStrings, true) }
+
 // Prog.Flag
 type ProgFlag uint32
 
@@ -699,43 +800,262 @@ const (
 	PF_MASKPROC ProgFlag = 0xf0000000 // Processor-specific.
 )
 
-// IsValidELFClass validates the ELF class of the binary.
-func IsValidELFClass(c Class) bool {
-	switch c {
-	case ELFCLASS32:
-		return true
-	case ELFCLASS64:
-		return true
-	default:
-		return false
-	}
+var programFlagStrings = []flagName{
+	{0x1, "PF_X"},
+	{0x2, "PF_W"},
+	{0x4, "PF_R"},
 }
 
-// IsValidByteOrder validates the ELF byte order field.
-func IsValidByteOrder(b Data) bool {
-	switch b {
-	case ELFDATA2LSB:
-		return true
-	case ELFDATA2MSB:
-		return true
-	default:
-		return false
-	}
+func (pf ProgFlag) String() string   { return matchFlagName(uint32(pf), programFlagStrings, false) }
+func (pf ProgFlag) GoString() string { return matchFlagName(uint32(pf), programFlagStrings, true) }
+
+// DynTag
+type DynTag int
+
+const (
+	DT_NULL         DynTag = 0  /* Terminating entry. */
+	DT_NEEDED       DynTag = 1  /* String table offset of a needed shared library. */
+	DT_PLTRELSZ     DynTag = 2  /* Total size in bytes of PLT relocations. */
+	DT_PLTGOT       DynTag = 3  /* Processor-dependent address. */
+	DT_HASH         DynTag = 4  /* Address of symbol hash table. */
+	DT_STRTAB       DynTag = 5  /* Address of string table. */
+	DT_SYMTAB       DynTag = 6  /* Address of symbol table. */
+	DT_RELA         DynTag = 7  /* Address of ElfNN_Rela relocations. */
+	DT_RELASZ       DynTag = 8  /* Total size of ElfNN_Rela relocations. */
+	DT_RELAENT      DynTag = 9  /* Size of each ElfNN_Rela relocation entry. */
+	DT_STRSZ        DynTag = 10 /* Size of string table. */
+	DT_SYMENT       DynTag = 11 /* Size of each symbol table entry. */
+	DT_INIT         DynTag = 12 /* Address of initialization function. */
+	DT_FINI         DynTag = 13 /* Address of finalization function. */
+	DT_SONAME       DynTag = 14 /* String table offset of shared object name. */
+	DT_RPATH        DynTag = 15 /* String table offset of library path. [sup] */
+	DT_SYMBOLIC     DynTag = 16 /* Indicates "symbolic" linking. [sup] */
+	DT_REL          DynTag = 17 /* Address of ElfNN_Rel relocations. */
+	DT_RELSZ        DynTag = 18 /* Total size of ElfNN_Rel relocations. */
+	DT_RELENT       DynTag = 19 /* Size of each ElfNN_Rel relocation. */
+	DT_PLTREL       DynTag = 20 /* Type of relocation used for PLT. */
+	DT_DEBUG        DynTag = 21 /* Reserved (not used). */
+	DT_TEXTREL      DynTag = 22 /* Indicates there may be relocations in non-writable segments. [sup] */
+	DT_JMPREL       DynTag = 23 /* Address of PLT relocations. */
+	DT_BIND_NOW     DynTag = 24 /* [sup] */
+	DT_INIT_ARRAY   DynTag = 25 /* Address of the array of pointers to initialization functions */
+	DT_FINI_ARRAY   DynTag = 26 /* Address of the array of pointers to termination functions */
+	DT_INIT_ARRAYSZ DynTag = 27 /* Size in bytes of the array of initialization functions. */
+	DT_FINI_ARRAYSZ DynTag = 28 /* Size in bytes of the array of termination functions. */
+	DT_RUNPATH      DynTag = 29 /* String table offset of a null-terminated library search path string. */
+	DT_FLAGS        DynTag = 30 /* Object specific flag values. */
+	DT_ENCODING     DynTag = 32 /* Values greater than or equal to DT_ENCODING
+	   and less than DT_LOOS follow the rules for
+	   the interpretation of the d_un union
+	   as follows: even == 'd_ptr', even == 'd_val'
+	   or none */
+	DT_PREINIT_ARRAY              DynTag = 32         /* Address of the array of pointers to pre-initialization functions. */
+	DT_PREINIT_ARRAYSZ            DynTag = 33         /* Size in bytes of the array of pre-initialization functions. */
+	DT_SYMTAB_SHNDX               DynTag = 34         /* Address of SHT_SYMTAB_SHNDX section. */
+	DT_LOOS                       DynTag = 0x6000000d /* First OS-specific */
+	DT_HIOS                       DynTag = 0x6ffff000 /* Last OS-specific */
+	DT_VALRNGLO                   DynTag = 0x6ffffd00
+	DT_GNU_PRELINKED              DynTag = 0x6ffffdf5
+	DT_GNU_CONFLICTSZ             DynTag = 0x6ffffdf6
+	DT_GNU_LIBLISTSZ              DynTag = 0x6ffffdf7
+	DT_CHECKSUM                   DynTag = 0x6ffffdf8
+	DT_PLTPADSZ                   DynTag = 0x6ffffdf9
+	DT_MOVEENT                    DynTag = 0x6ffffdfa
+	DT_MOVESZ                     DynTag = 0x6ffffdfb
+	DT_FEATURE                    DynTag = 0x6ffffdfc
+	DT_POSFLAG_1                  DynTag = 0x6ffffdfd
+	DT_SYMINSZ                    DynTag = 0x6ffffdfe
+	DT_SYMINENT                   DynTag = 0x6ffffdff
+	DT_VALRNGHI                   DynTag = 0x6ffffdff
+	DT_ADDRRNGLO                  DynTag = 0x6ffffe00
+	DT_GNU_HASH                   DynTag = 0x6ffffef5
+	DT_TLSDESC_PLT                DynTag = 0x6ffffef6
+	DT_TLSDESC_GOT                DynTag = 0x6ffffef7
+	DT_GNU_CONFLICT               DynTag = 0x6ffffef8
+	DT_GNU_LIBLIST                DynTag = 0x6ffffef9
+	DT_CONFIG                     DynTag = 0x6ffffefa
+	DT_DEPAUDIT                   DynTag = 0x6ffffefb
+	DT_AUDIT                      DynTag = 0x6ffffefc
+	DT_PLTPAD                     DynTag = 0x6ffffefd
+	DT_MOVETAB                    DynTag = 0x6ffffefe
+	DT_SYMINFO                    DynTag = 0x6ffffeff
+	DT_ADDRRNGHI                  DynTag = 0x6ffffeff
+	DT_VERSYM                     DynTag = 0x6ffffff0
+	DT_RELACOUNT                  DynTag = 0x6ffffff9
+	DT_RELCOUNT                   DynTag = 0x6ffffffa
+	DT_FLAGS_1                    DynTag = 0x6ffffffb
+	DT_VERDEF                     DynTag = 0x6ffffffc
+	DT_VERDEFNUM                  DynTag = 0x6ffffffd
+	DT_VERNEED                    DynTag = 0x6ffffffe
+	DT_VERNEEDNUM                 DynTag = 0x6fffffff
+	DT_LOPROC                     DynTag = 0x70000000 /* First processor-specific type. */
+	DT_MIPS_RLD_VERSION           DynTag = 0x70000001
+	DT_MIPS_TIME_STAMP            DynTag = 0x70000002
+	DT_MIPS_ICHECKSUM             DynTag = 0x70000003
+	DT_MIPS_IVERSION              DynTag = 0x70000004
+	DT_MIPS_FLAGS                 DynTag = 0x70000005
+	DT_MIPS_BASE_ADDRESS          DynTag = 0x70000006
+	DT_MIPS_MSYM                  DynTag = 0x70000007
+	DT_MIPS_CONFLICT              DynTag = 0x70000008
+	DT_MIPS_LIBLIST               DynTag = 0x70000009
+	DT_MIPS_LOCAL_GOTNO           DynTag = 0x7000000a
+	DT_MIPS_CONFLICTNO            DynTag = 0x7000000b
+	DT_MIPS_LIBLISTNO             DynTag = 0x70000010
+	DT_MIPS_SYMTABNO              DynTag = 0x70000011
+	DT_MIPS_UNREFEXTNO            DynTag = 0x70000012
+	DT_MIPS_GOTSYM                DynTag = 0x70000013
+	DT_MIPS_HIPAGENO              DynTag = 0x70000014
+	DT_MIPS_RLD_MAP               DynTag = 0x70000016
+	DT_MIPS_DELTA_CLASS           DynTag = 0x70000017
+	DT_MIPS_DELTA_CLASS_NO        DynTag = 0x70000018
+	DT_MIPS_DELTA_INSTANCE        DynTag = 0x70000019
+	DT_MIPS_DELTA_INSTANCE_NO     DynTag = 0x7000001a
+	DT_MIPS_DELTA_RELOC           DynTag = 0x7000001b
+	DT_MIPS_DELTA_RELOC_NO        DynTag = 0x7000001c
+	DT_MIPS_DELTA_SYM             DynTag = 0x7000001d
+	DT_MIPS_DELTA_SYM_NO          DynTag = 0x7000001e
+	DT_MIPS_DELTA_CLASSSYM        DynTag = 0x70000020
+	DT_MIPS_DELTA_CLASSSYM_NO     DynTag = 0x70000021
+	DT_MIPS_CXX_FLAGS             DynTag = 0x70000022
+	DT_MIPS_PIXIE_INIT            DynTag = 0x70000023
+	DT_MIPS_SYMBOL_LIB            DynTag = 0x70000024
+	DT_MIPS_LOCALPAGE_GOTIDX      DynTag = 0x70000025
+	DT_MIPS_LOCAL_GOTIDX          DynTag = 0x70000026
+	DT_MIPS_HIDDEN_GOTIDX         DynTag = 0x70000027
+	DT_MIPS_PROTECTED_GOTIDX      DynTag = 0x70000028
+	DT_MIPS_OPTIONS               DynTag = 0x70000029
+	DT_MIPS_INTERFACE             DynTag = 0x7000002a
+	DT_MIPS_DYNSTR_ALIGN          DynTag = 0x7000002b
+	DT_MIPS_INTERFACE_SIZE        DynTag = 0x7000002c
+	DT_MIPS_RLD_TEXT_RESOLVE_ADDR DynTag = 0x7000002d
+	DT_MIPS_PERF_SUFFIX           DynTag = 0x7000002e
+	DT_MIPS_COMPACT_SIZE          DynTag = 0x7000002f
+	DT_MIPS_GP_VALUE              DynTag = 0x70000030
+	DT_MIPS_AUX_DYNAMIC           DynTag = 0x70000031
+	DT_MIPS_PLTGOT                DynTag = 0x70000032
+	DT_MIPS_RWPLT                 DynTag = 0x70000034
+	DT_MIPS_RLD_MAP_REL           DynTag = 0x70000035
+	DT_PPC_GOT                    DynTag = 0x70000000
+	DT_PPC_OPT                    DynTag = 0x70000001
+	DT_PPC64_GLINK                DynTag = 0x70000000
+	DT_PPC64_OPD                  DynTag = 0x70000001
+	DT_PPC64_OPDSZ                DynTag = 0x70000002
+	DT_PPC64_OPT                  DynTag = 0x70000003
+	DT_SPARC_REGISTER             DynTag = 0x70000001
+	DT_AUXILIARY                  DynTag = 0x7ffffffd
+	DT_USED                       DynTag = 0x7ffffffe
+	DT_FILTER                     DynTag = 0x7fffffff
+	DT_HIPROC                     DynTag = 0x7fffffff /* Last processor-specific type. */
+)
+
+var dtStrings = []flagName{
+	{0, "DT_NULL"},
+	{1, "DT_NEEDED"},
+	{2, "DT_PLTRELSZ"},
+	{3, "DT_PLTGOT"},
+	{4, "DT_HASH"},
+	{5, "DT_STRTAB"},
+	{6, "DT_SYMTAB"},
+	{7, "DT_RELA"},
+	{8, "DT_RELASZ"},
+	{9, "DT_RELAENT"},
+	{10, "DT_STRSZ"},
+	{11, "DT_SYMENT"},
+	{12, "DT_INIT"},
+	{13, "DT_FINI"},
+	{14, "DT_SONAME"},
+	{15, "DT_RPATH"},
+	{16, "DT_SYMBOLIC"},
+	{17, "DT_REL"},
+	{18, "DT_RELSZ"},
+	{19, "DT_RELENT"},
+	{20, "DT_PLTREL"},
+	{21, "DT_DEBUG"},
+	{22, "DT_TEXTREL"},
+	{23, "DT_JMPREL"},
+	{24, "DT_BIND_NOW"},
+	{25, "DT_INIT_ARRAY"},
+	{26, "DT_FINI_ARRAY"},
+	{27, "DT_INIT_ARRAYSZ"},
+	{28, "DT_FINI_ARRAYSZ"},
+	{29, "DT_RUNPATH"},
+	{30, "DT_FLAGS"},
+	{32, "DT_ENCODING"},
+	{32, "DT_PREINIT_ARRAY"},
+	{33, "DT_PREINIT_ARRAYSZ"},
+	{34, "DT_SYMTAB_SHNDX"},
+	{0x6000000d, "DT_LOOS"},
+	{0x6ffff000, "DT_HIOS"},
+	{0x6ffffd00, "DT_VALRNGLO"},
+	{0x6ffffdf5, "DT_GNU_PRELINKED"},
+	{0x6ffffdf6, "DT_GNU_CONFLICTSZ"},
+	{0x6ffffdf7, "DT_GNU_LIBLISTSZ"},
+	{0x6ffffdf8, "DT_CHECKSUM"},
+	{0x6ffffdf9, "DT_PLTPADSZ"},
+	{0x6ffffdfa, "DT_MOVEENT"},
+	{0x6ffffdfb, "DT_MOVESZ"},
+	{0x6ffffdfc, "DT_FEATURE"},
+	{0x6ffffdfd, "DT_POSFLAG_1"},
+	{0x6ffffdfe, "DT_SYMINSZ"},
+	{0x6ffffdff, "DT_SYMINENT"},
+	{0x6ffffdff, "DT_VALRNGHI"},
+	{0x6ffffe00, "DT_ADDRRNGLO"},
+	{0x6ffffef5, "DT_GNU_HASH"},
+	{0x6ffffef6, "DT_TLSDESC_PLT"},
+	{0x6ffffef7, "DT_TLSDESC_GOT"},
+	{0x6ffffef8, "DT_GNU_CONFLICT"},
+	{0x6ffffef9, "DT_GNU_LIBLIST"},
+	{0x6ffffefa, "DT_CONFIG"},
+	{0x6ffffefb, "DT_DEPAUDIT"},
+	{0x6ffffefc, "DT_AUDIT"},
+	{0x6ffffefd, "DT_PLTPAD"},
+	{0x6ffffefe, "DT_MOVETAB"},
+	{0x6ffffeff, "DT_SYMINFO"},
+	{0x6ffffeff, "DT_ADDRRNGHI"},
+	{0x6ffffff0, "DT_VERSYM"},
+	{0x6ffffff9, "DT_RELACOUNT"},
+	{0x6ffffffa, "DT_RELCOUNT"},
+	{0x6ffffffb, "DT_FLAGS_1"},
+	{0x6ffffffc, "DT_VERDEF"},
+	{0x6ffffffd, "DT_VERDEFNUM"},
+	{0x6ffffffe, "DT_VERNEED"},
+	{0x6fffffff, "DT_VERNEEDNUM"},
+	{0x70000000, "DT_LOPROC"},
+	// We don't list the processor-dependent DynTags,
+	// as the values overlap.
+	{0x7ffffffd, "DT_AUXILIARY"},
+	{0x7ffffffe, "DT_USED"},
+	{0x7fffffff, "DT_FILTER"},
 }
 
-// IsValidVersion validates against the current default version flag EV_CURRENT.
-func IsValidVersion(b Version) bool {
-	return b == EV_CURRENT
+func (dt DynTag) String() string   { return stringify(uint32(dt), dtStrings, false) }
+func (dt DynTag) GoString() string { return stringify(uint32(dt), dtStrings, true) }
+
+// DT_FLAGS values.
+type DynFlag int
+
+const (
+	DF_ORIGIN DynFlag = 0x0001 /* Indicates that the object being loaded may
+	   make reference to the
+	   $ORIGIN substitution string */
+	DF_SYMBOLIC DynFlag = 0x0002 /* Indicates "symbolic" linking. */
+	DF_TEXTREL  DynFlag = 0x0004 /* Indicates there may be relocations in non-writable segments. */
+	DF_BIND_NOW DynFlag = 0x0008 /* Indicates that the dynamic linker should
+	   process all relocations for the object
+	   containing this entry before transferring
+	   control to the program. */
+	DF_STATIC_TLS DynFlag = 0x0010 /* Indicates that the shared object or
+	   executable contains code using a static
+	   thread-local storage scheme. */
+)
+
+var dflagStrings = []flagName{
+	{0x0001, "DF_ORIGIN"},
+	{0x0002, "DF_SYMBOLIC"},
+	{0x0004, "DF_TEXTREL"},
+	{0x0008, "DF_BIND_NOW"},
+	{0x0010, "DF_STATIC_TLS"},
 }
 
-// goByteOrder encodes a Data field to a native Go byte order field.
-func ByteOrder(b Data) binary.ByteOrder {
-	switch b {
-	case ELFDATA2LSB:
-		return binary.LittleEndian
-	case ELFDATA2MSB:
-		return binary.BigEndian
-	default:
-		return binary.LittleEndian
-	}
-}
+func (df DynFlag) String() string   { return matchFlagName(uint32(df), dflagStrings, false) }
+func (df DynFlag) GoString() string { return matchFlagName(uint32(df), dflagStrings, true) }

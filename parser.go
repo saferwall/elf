@@ -237,10 +237,10 @@ func (p *Parser) parseELFSections64() error {
 		}
 	}
 	shnum := p.F.Header64.Shnum
-	sections := make([]*ELFSection64, shnum)
+	sections := make([]*ELF64Section, shnum)
 
 	for i := 0; i < int(shnum); i++ {
-		s := &ELFSection64{}
+		s := &ELF64Section{}
 		size := p.F.SectionHeaders64[i].Size
 		s.ELF64SectionHeader = p.F.SectionHeaders64[i]
 		s.sr = io.NewSectionReader(p.fs, int64(s.Off), int64(size))
@@ -288,10 +288,10 @@ func (p *Parser) parseELFSections32() error {
 		}
 	}
 	shnum := p.F.Header32.Shnum
-	sections := make([]*ELFSection32, shnum)
+	sections := make([]*ELF32Section, shnum)
 
 	for i := 0; i < int(shnum); i++ {
-		s := &ELFSection32{}
+		s := &ELF32Section{}
 		size := p.F.SectionHeaders32[i].Size
 		s.ELF32SectionHeader = p.F.SectionHeaders32[i]
 		s.sr = io.NewSectionReader(p.fs, int64(s.Off), int64(size))

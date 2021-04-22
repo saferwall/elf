@@ -1,8 +1,10 @@
 package elf
 
-// SymbolTable represents information needed to locate and relocate
+const Sym64Size = 24
+
+// ELF64SymbolTableEntry represents information needed to locate and relocate
 // a program's symbolic definitions, it's an array of SymbolTableEntry
-type ELFSymbolTableEntry64 struct {
+type ELF64SymbolTableEntry struct {
 	Name  uint32 // String table index of name.
 	Info  uint8  // Type and binding information.
 	Other uint8  // Reserved (not used).
