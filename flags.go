@@ -1059,3 +1059,101 @@ var dflagStrings = []flagName{
 
 func (df DynFlag) String() string   { return matchFlagName(uint32(df), dflagStrings, false) }
 func (df DynFlag) GoString() string { return matchFlagName(uint32(df), dflagStrings, true) }
+
+// NType values; used in core files.
+type NType int
+
+const (
+	NT_PRSTATUS NType = 1 /* Process status. */
+	NT_FPREGSET NType = 2 /* Floating point registers. */
+	NT_PRPSINFO NType = 3 /* Process state info. */
+)
+
+var ntypeStrings = []flagName{
+	{1, "NT_PRSTATUS"},
+	{2, "NT_FPREGSET"},
+	{3, "NT_PRPSINFO"},
+}
+
+func (i NType) String() string   { return stringify(uint32(i), ntypeStrings, false) }
+func (i NType) GoString() string { return stringify(uint32(i), ntypeStrings, true) }
+
+/* Symbol Binding - ELFNN_ST_BIND - st_info */
+type SymBind int
+
+const (
+	STB_LOCAL  SymBind = 0  /* Local symbol */
+	STB_GLOBAL SymBind = 1  /* Global symbol */
+	STB_WEAK   SymBind = 2  /* like global - lower precedence */
+	STB_LOOS   SymBind = 10 /* Reserved range for operating system */
+	STB_HIOS   SymBind = 12 /*   specific semantics. */
+	STB_LOPROC SymBind = 13 /* reserved range for processor */
+	STB_HIPROC SymBind = 15 /*   specific semantics. */
+)
+
+var stbStrings = []flagName{
+	{0, "STB_LOCAL"},
+	{1, "STB_GLOBAL"},
+	{2, "STB_WEAK"},
+	{10, "STB_LOOS"},
+	{12, "STB_HIOS"},
+	{13, "STB_LOPROC"},
+	{15, "STB_HIPROC"},
+}
+
+func (i SymBind) String() string   { return stringify(uint32(i), stbStrings, false) }
+func (i SymBind) GoString() string { return stringify(uint32(i), stbStrings, true) }
+
+/* Symbol type - ELFNN_ST_TYPE - st_info */
+type SymType int
+
+const (
+	STT_NOTYPE  SymType = 0  /* Unspecified type. */
+	STT_OBJECT  SymType = 1  /* Data object. */
+	STT_FUNC    SymType = 2  /* Function. */
+	STT_SECTION SymType = 3  /* Section. */
+	STT_FILE    SymType = 4  /* Source file. */
+	STT_COMMON  SymType = 5  /* Uninitialized common block. */
+	STT_TLS     SymType = 6  /* TLS object. */
+	STT_LOOS    SymType = 10 /* Reserved range for operating system */
+	STT_HIOS    SymType = 12 /*   specific semantics. */
+	STT_LOPROC  SymType = 13 /* reserved range for processor */
+	STT_HIPROC  SymType = 15 /*   specific semantics. */
+)
+
+var sttStrings = []flagName{
+	{0, "STT_NOTYPE"},
+	{1, "STT_OBJECT"},
+	{2, "STT_FUNC"},
+	{3, "STT_SECTION"},
+	{4, "STT_FILE"},
+	{5, "STT_COMMON"},
+	{6, "STT_TLS"},
+	{10, "STT_LOOS"},
+	{12, "STT_HIOS"},
+	{13, "STT_LOPROC"},
+	{15, "STT_HIPROC"},
+}
+
+func (i SymType) String() string   { return stringify(uint32(i), sttStrings, false) }
+func (i SymType) GoString() string { return stringify(uint32(i), sttStrings, true) }
+
+/* Symbol visibility - ELFNN_ST_VISIBILITY - st_other */
+type SymVis int
+
+const (
+	STV_DEFAULT   SymVis = 0x0 /* Default visibility (see binding). */
+	STV_INTERNAL  SymVis = 0x1 /* Special meaning in relocatable objects. */
+	STV_HIDDEN    SymVis = 0x2 /* Not visible. */
+	STV_PROTECTED SymVis = 0x3 /* Visible but not preemptible. */
+)
+
+var stvStrings = []flagName{
+	{0x0, "STV_DEFAULT"},
+	{0x1, "STV_INTERNAL"},
+	{0x2, "STV_HIDDEN"},
+	{0x3, "STV_PROTECTED"},
+}
+
+func (i SymVis) String() string   { return stringify(uint32(i), stvStrings, false) }
+func (i SymVis) GoString() string { return stringify(uint32(i), stvStrings, true) }
