@@ -61,7 +61,6 @@ func main() {
 	fmt.Println(string(jsonHeader))
 }
 
-
 ```
 
 ## Docs & API
