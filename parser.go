@@ -1,6 +1,7 @@
 package elf
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -241,6 +242,19 @@ func getString(section []byte, start int) (string, bool) {
 	return "", false
 }
 
+// ParseELFSections reads the raw elf sections.
+func (p *Parser) ParseELFSections(c Class) error {
+
+	switch c {
+	case ELFCLASS32:
+		return p.parseELFSections32()
+	case ELFCLASS64:
+		return p.parseELFSections64()
+	default:
+		return errors.New("unknown ELF class")
+	}
+}
+
 // parseELFSections64 parses all sections in a 64-bit ELF binary.
 func (p *Parser) parseELFSections64() error {
 	if len(p.F.SectionHeaders64) == 0 {
@@ -343,6 +357,19 @@ func (p *Parser) parseELFSections32() error {
 	return nil
 }
 
+// ParseELFProgramHeader reads the raw elf program header.
+func (p *Parser) ParseELFProgramHeader(c Class) error {
+
+	switch c {
+	case ELFCLASS32:
+		return p.parseELFProgramHeader32()
+	case ELFCLASS64:
+		return p.parseELFProgramHeader64()
+	default:
+		return errors.New("unknown ELF class")
+	}
+}
+
 // parseELFProgramHeader64 parses all program header table entries in a 64-bit ELF binary.
 func (p *Parser) parseELFProgramHeader64() error {
 	phOff := p.F.Header64.Phoff
@@ -382,5 +409,109 @@ func (p *Parser) parseELFProgramHeader32() error {
 		programHeaders[i] = ph
 	}
 	p.F.ProgramHeaders32 = programHeaders
+	return nil
+}
+
+// ParseELFSymbols returns a slice of Symbols from parsing the symbol table
+// with the given type, along with the associated string table.
+func (f *File) ParseELFSymbols(typ SectionType) error {
+	switch f.Class() {
+	case ELFCLASS64:
+		return f.getSymbols64(typ)
+	case ELFCLASS32:
+		return f.getSymbols32(typ)
+	}
+	return errors.New("unknown ELF class")
+}
+
+// ErrNoSymbols is returned by File.Symbols and File.DynamicSymbols
+// if there is no such section in the File.
+var ErrNoSymbols = errors.New("no symbol section")
+
+func (f *File) getSymbols32(typ SectionType) error {
+	symtabSection := f.GetESectionByType(typ)
+	if symtabSection == nil {
+		return ErrNoSymbols
+	}
+	data, err := symtabSection.Data()
+	if err != nil {
+		return errors.New("cannot load symbol section")
+	}
+	symtab := bytes.NewReader(data)
+	if symtab.Len()%Sym32Size != 0 {
+		return errors.New("length of symbol section is not a multiple of SymSize")
+	}
+	strdata, err := f.stringTable(symtabSection.Link)
+	if err != nil {
+		return errors.New("cannot load string table section")
+	}
+	// The first entry is all zeros.
+	var skip [Sym32Size]byte
+	symtab.Read(skip[:])
+	symbols := make([]ELF32SymbolTableEntry, symtab.Len()/Sym32Size)
+	namedSymbols := make([]Symbol, symtab.Len()/Sym32Size)
+	i := 0
+	var sym ELF32SymbolTableEntry
+	for symtab.Len() > 0 {
+		binary.Read(symtab, f.ByteOrder(), &sym)
+		symbols[i] = sym
+		str, _ := getString(strdata, int(sym.Name))
+		namedSymbols[i] = Symbol{
+			Name:    str,
+			Info:    sym.Info,
+			Other:   sym.Other,
+			Section: SectionIndex(sym.Shndx),
+			Value:   uint64(sym.Value),
+			Size:    uint64(sym.Size),
+			Version: "",
+			Library: "",
+		}
+		i++
+	}
+	f.Symbols32 = symbols
+	f.NamedSymbols = namedSymbols
+	return nil
+}
+func (f *File) getSymbols64(typ SectionType) error {
+	symtabSection := f.GetESectionByType(typ)
+	if symtabSection == nil {
+		return ErrNoSymbols
+	}
+	data, err := symtabSection.Data()
+	if err != nil {
+		return errors.New("cannot load symbol section")
+	}
+	symtab := bytes.NewReader(data)
+	if symtab.Len()%Sym64Size != 0 {
+		return errors.New("length of symbol section is not a multiple of Sym64Size")
+	}
+	strdata, err := f.stringTable(symtabSection.Link)
+	if err != nil {
+		return errors.New("cannot load string table section")
+	}
+	// The first entry is all zeros.
+	var skip [Sym64Size]byte
+	symtab.Read(skip[:])
+	symbols := make([]ELF64SymbolTableEntry, symtab.Len()/Sym64Size)
+	namedSymbols := make([]Symbol, symtab.Len()/Sym64Size)
+	i := 0
+	var sym ELF64SymbolTableEntry
+	for symtab.Len() > 0 {
+		binary.Read(symtab, f.ByteOrder(), &sym)
+		str, _ := getString(strdata, int(sym.Name))
+		namedSymbols[i] = Symbol{
+			Name:    str,
+			Info:    sym.Info,
+			Other:   sym.Other,
+			Section: SectionIndex(sym.Shndx),
+			Value:   sym.Value,
+			Size:    sym.Size,
+			Version: "",
+			Library: "",
+		}
+		i++
+	}
+	f.Symbols64 = symbols
+	f.NamedSymbols = namedSymbols
 	return nil
 }

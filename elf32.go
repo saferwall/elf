@@ -68,3 +68,10 @@ type ELF32Section struct {
 	// sectionReader is used to unpack byte data to decode section name
 	sr *io.SectionReader
 }
+
+// ELF32DynamicTableEntry represents the Dynamic structure.
+// The ".dynamic" section contains an array of them.
+type ELF32DynamicTableEntry struct {
+	Tag int32  // Identifies the type of the dynamic table entry.
+	Val uint32 // Represents integer values
+}

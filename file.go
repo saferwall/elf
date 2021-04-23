@@ -1,6 +1,9 @@
 package elf
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"errors"
+)
 
 // FileIdent is a representation of the raw ident array (first 16 bytes of an ELF file)
 type FileIdent struct {
@@ -42,6 +45,18 @@ type SectionTable struct {
 // or dynamically-linked library in preparation for execution.
 type ProgramHeaderTable struct{}
 
+// A Symbol represents an entry in an ELF symbol table section.
+type Symbol struct {
+	Name        string
+	Info, Other byte
+	Section     SectionIndex
+	Value, Size uint64
+	// Version and Library are present only for the dynamic symbol
+	// table.
+	Version string
+	Library string
+}
+
 // File is an in-memory iterable representation of a raw elf binary.
 // this is merely used to ease the use of the package as a library
 // and allow feature modification and rebuilding of ELF files.
@@ -55,11 +70,19 @@ type File struct {
 	ProgramHeaders64 []ELF64ProgramHeader
 	Sections32       []*ELF32Section
 	Sections64       []*ELF64Section
+	Symbols32        []ELF32SymbolTableEntry
+	Symbols64        []ELF64SymbolTableEntry
+	NamedSymbols     []Symbol
 }
 
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
 func (f *File) Class() Class {
 	return f.Ident.Class
+}
+
+// ByteOrder returns byte order of the binary.
+func (f *File) ByteOrder() binary.ByteOrder {
+	return f.Ident.ByteOrder
 }
 
 // IsELF64 returns true if the binary was compiled with an x64 architecture target.
@@ -84,6 +107,25 @@ func (f *File) SectionNames() []string {
 	}
 
 	return []string{""}
+}
+
+// GetSectionByType returns the first section with the given type T (nil otherwise).
+func (f *File) GetESectionByType(t SectionType) *ELF64Section {
+	for _, s := range f.Sections64 {
+		if s.Type == uint32(t) {
+			return s
+		}
+	}
+	return nil
+}
+
+// stringTable reads and returns the string table given by the
+// specified link value.
+func (f *File) stringTable(link uint32) ([]byte, error) {
+	if link <= 0 || link >= uint32(len(f.Sections64)) {
+		return nil, errors.New("section has invalid string table link")
+	}
+	return f.Sections64[link].Data()
 }
 
 // IsValidELFClass validates the ELF class of the binary.
