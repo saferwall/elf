@@ -28,7 +28,7 @@ func main() {
 	}
 	fmt.Println(string(jsonHeader))
 
-	err = p.ParseELFSectionHeader(elf.ELFCLASS64)
+	err = p.ParseELFSectionHeaders(elf.ELFCLASS64)
 	if err != nil {
 		panic(err)
 	}

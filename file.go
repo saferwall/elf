@@ -75,6 +75,23 @@ type File struct {
 	NamedSymbols     []Symbol
 }
 
+func NewBinaryFile() *File {
+	return &File{
+		Ident:            FileIdent{},
+		Header32:         ELF32Header{},
+		Header64:         ELF64Header{},
+		SectionHeaders32: []ELF32SectionHeader{},
+		SectionHeaders64: []ELF64SectionHeader{},
+		ProgramHeaders32: []ELF32ProgramHeader{},
+		ProgramHeaders64: []ELF64ProgramHeader{},
+		Sections32:       []*ELF32Section{},
+		Sections64:       []*ELF64Section{},
+		Symbols32:        []ELF32SymbolTableEntry{},
+		Symbols64:        []ELF64SymbolTableEntry{},
+		NamedSymbols:     []Symbol{},
+	}
+}
+
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
 func (f *File) Class() Class {
 	return f.Ident.Class
@@ -110,7 +127,7 @@ func (f *File) SectionNames() []string {
 }
 
 // GetSectionByType returns the first section with the given type T (nil otherwise).
-func (f *File) GetESectionByType(t SectionType) *ELF64Section {
+func (f *File) GetSectionByType(t SectionType) *ELF64Section {
 	for _, s := range f.Sections64 {
 		if s.Type == uint32(t) {
 			return s

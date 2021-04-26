@@ -487,7 +487,7 @@ func TestParser(t *testing.T) {
 				t.Fatal("failed to parse ELF header with error :", err)
 			}
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
-			err = p.ParseELFSectionHeader(ELFCLASS64)
+			err = p.ParseELFSectionHeaders(ELFCLASS64)
 			if err != nil {
 				t.Fatal("failed to parse ELF section headers with error :", err)
 			}
@@ -912,7 +912,7 @@ func TestParser(t *testing.T) {
 				t.Fatal("failed to parse ELF header with error :", err)
 			}
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
-			err = p.ParseELFSectionHeader(ELFCLASS64)
+			err = p.ParseELFSectionHeaders(ELFCLASS64)
 			if err != nil {
 				t.Fatal("failed to parse ELF section headers with error :", err)
 			}
@@ -1100,7 +1100,7 @@ func TestParser(t *testing.T) {
 				t.Fatal("failed to parse ELF header with error :", err)
 			}
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
-			err = p.parseELFProgramHeader64()
+			err = p.parseELFProgramHeaders64()
 			if err != nil {
 				t.Fatal("failed to parse ELF program headers with error :", err)
 			}
@@ -1528,7 +1528,7 @@ func TestParser(t *testing.T) {
 				t.Fatal("failed to parse ELF header with error :", err)
 			}
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
-			err = p.ParseELFSectionHeader(ELFCLASS64)
+			err = p.ParseELFSectionHeaders(ELFCLASS64)
 			if err != nil {
 				t.Fatal("failed to parse ELF section headers with error :", err)
 			}
@@ -1542,7 +1542,7 @@ func TestParser(t *testing.T) {
 			// readelf -s /bin/ls will show that the table has 139 entries
 			// but the spec enforces a specific length and doesn't include the
 			// first notype entry.
-			err = p.F.ParseELFSymbols(SHT_DYNSYM)
+			err = p.ParseELFSymbols(ELFCLASS64, SHT_DYNSYM)
 			if err != nil {
 				t.Fatal("failed to parse ELF section headers with error :", err)
 			}

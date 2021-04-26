@@ -44,6 +44,31 @@ func NewBytes(data []byte) (*Parser, error) {
 
 // Parse will parse the entire ELF file.
 func (p *Parser) Parse() error {
+	err := p.ParseIdent()
+	if err != nil {
+		return err
+	}
+	elfClass := p.F.Ident.Class
+	err = p.ParseELFHeader(elfClass)
+	if err != nil {
+		return err
+	}
+	err = p.ParseELFSectionHeaders(elfClass)
+	if err != nil {
+		return err
+	}
+	err = p.ParseELFSections(elfClass)
+	if err != nil {
+		return err
+	}
+	err = p.ParseELFProgramHeaders(elfClass)
+	if err != nil {
+		return err
+	}
+	err = p.ParseELFSymbols(elfClass, SHT_DYNSYM)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -150,8 +175,8 @@ func (p *Parser) parseELFHeader64() error {
 	return nil
 }
 
-// ParseELFSectionHeader reads the raw elf section header.
-func (p *Parser) ParseELFSectionHeader(c Class) error {
+// ParseELFSectionHeaders reads the raw elf section header.
+func (p *Parser) ParseELFSectionHeaders(c Class) error {
 
 	switch c {
 	case ELFCLASS32:
@@ -357,21 +382,21 @@ func (p *Parser) parseELFSections32() error {
 	return nil
 }
 
-// ParseELFProgramHeader reads the raw elf program header.
-func (p *Parser) ParseELFProgramHeader(c Class) error {
+// ParseELFProgramHeaders reads the raw elf program header.
+func (p *Parser) ParseELFProgramHeaders(c Class) error {
 
 	switch c {
 	case ELFCLASS32:
-		return p.parseELFProgramHeader32()
+		return p.parseELFProgramHeaders32()
 	case ELFCLASS64:
-		return p.parseELFProgramHeader64()
+		return p.parseELFProgramHeaders64()
 	default:
 		return errors.New("unknown ELF class")
 	}
 }
 
-// parseELFProgramHeader64 parses all program header table entries in a 64-bit ELF binary.
-func (p *Parser) parseELFProgramHeader64() error {
+// parseELFProgramHeaders64 parses all program header table entries in a 64-bit ELF binary.
+func (p *Parser) parseELFProgramHeaders64() error {
 	phOff := p.F.Header64.Phoff
 	phNum := p.F.Header64.Phnum
 	phEntSize := p.F.Header64.Phentsize
@@ -391,8 +416,8 @@ func (p *Parser) parseELFProgramHeader64() error {
 	return nil
 }
 
-// parseELFProgramHeader32 parses all program header table entries in a 32-bit ELF binary.
-func (p *Parser) parseELFProgramHeader32() error {
+// parseELFProgramHeaders32 parses all program header table entries in a 32-bit ELF binary.
+func (p *Parser) parseELFProgramHeaders32() error {
 	phOff := p.F.Header32.Phoff
 	phNum := p.F.Header32.Phnum
 	phEntSize := p.F.Header32.Phentsize
@@ -414,12 +439,12 @@ func (p *Parser) parseELFProgramHeader32() error {
 
 // ParseELFSymbols returns a slice of Symbols from parsing the symbol table
 // with the given type, along with the associated string table.
-func (f *File) ParseELFSymbols(typ SectionType) error {
-	switch f.Class() {
+func (p *Parser) ParseELFSymbols(c Class, typ SectionType) error {
+	switch c {
 	case ELFCLASS64:
-		return f.getSymbols64(typ)
+		return p.getSymbols64(typ)
 	case ELFCLASS32:
-		return f.getSymbols32(typ)
+		return p.getSymbols32(typ)
 	}
 	return errors.New("unknown ELF class")
 }
@@ -428,8 +453,8 @@ func (f *File) ParseELFSymbols(typ SectionType) error {
 // if there is no such section in the File.
 var ErrNoSymbols = errors.New("no symbol section")
 
-func (f *File) getSymbols32(typ SectionType) error {
-	symtabSection := f.GetESectionByType(typ)
+func (p *Parser) getSymbols32(typ SectionType) error {
+	symtabSection := p.F.GetSectionByType(typ)
 	if symtabSection == nil {
 		return ErrNoSymbols
 	}
@@ -441,7 +466,7 @@ func (f *File) getSymbols32(typ SectionType) error {
 	if symtab.Len()%Sym32Size != 0 {
 		return errors.New("length of symbol section is not a multiple of SymSize")
 	}
-	strdata, err := f.stringTable(symtabSection.Link)
+	strdata, err := p.F.stringTable(symtabSection.Link)
 	if err != nil {
 		return errors.New("cannot load string table section")
 	}
@@ -453,7 +478,7 @@ func (f *File) getSymbols32(typ SectionType) error {
 	i := 0
 	var sym ELF32SymbolTableEntry
 	for symtab.Len() > 0 {
-		binary.Read(symtab, f.ByteOrder(), &sym)
+		binary.Read(symtab, p.F.ByteOrder(), &sym)
 		symbols[i] = sym
 		str, _ := getString(strdata, int(sym.Name))
 		namedSymbols[i] = Symbol{
@@ -468,12 +493,12 @@ func (f *File) getSymbols32(typ SectionType) error {
 		}
 		i++
 	}
-	f.Symbols32 = symbols
-	f.NamedSymbols = namedSymbols
+	p.F.Symbols32 = symbols
+	p.F.NamedSymbols = namedSymbols
 	return nil
 }
-func (f *File) getSymbols64(typ SectionType) error {
-	symtabSection := f.GetESectionByType(typ)
+func (p *Parser) getSymbols64(typ SectionType) error {
+	symtabSection := p.F.GetSectionByType(typ)
 	if symtabSection == nil {
 		return ErrNoSymbols
 	}
@@ -485,7 +510,7 @@ func (f *File) getSymbols64(typ SectionType) error {
 	if symtab.Len()%Sym64Size != 0 {
 		return errors.New("length of symbol section is not a multiple of Sym64Size")
 	}
-	strdata, err := f.stringTable(symtabSection.Link)
+	strdata, err := p.F.stringTable(symtabSection.Link)
 	if err != nil {
 		return errors.New("cannot load string table section")
 	}
@@ -497,7 +522,7 @@ func (f *File) getSymbols64(typ SectionType) error {
 	i := 0
 	var sym ELF64SymbolTableEntry
 	for symtab.Len() > 0 {
-		binary.Read(symtab, f.ByteOrder(), &sym)
+		binary.Read(symtab, p.F.ByteOrder(), &sym)
 		str, _ := getString(strdata, int(sym.Name))
 		namedSymbols[i] = Symbol{
 			Name:    str,
@@ -511,7 +536,7 @@ func (f *File) getSymbols64(typ SectionType) error {
 		}
 		i++
 	}
-	f.Symbols64 = symbols
-	f.NamedSymbols = namedSymbols
+	p.F.Symbols64 = symbols
+	p.F.NamedSymbols = namedSymbols
 	return nil
 }
