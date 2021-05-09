@@ -36,15 +36,6 @@ type FileHeader struct {
 	SectionHeaderStringIdx uint16  `json:"sh_str_idx"`
 }
 
-// SectionTable is required for relocatable files, and optional for loadable files.
-type SectionTable struct {
-}
-
-// ProgramHeaderTable equired for loadable files, and optional for relocatable files.
-// This table describes the loadable segments and other data structures required for loading a program
-// or dynamically-linked library in preparation for execution.
-type ProgramHeaderTable struct{}
-
 // A Symbol represents an entry in an ELF symbol table section.
 type Symbol struct {
 	Name        string
@@ -61,7 +52,7 @@ type Symbol struct {
 // this is merely used to ease the use of the package as a library
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
-	Ident            FileIdent
+	FileHeader
 	Header32         ELF32Header
 	Header64         ELF64Header
 	SectionHeaders32 []ELF32SectionHeader
@@ -77,7 +68,7 @@ type File struct {
 
 func NewBinaryFile() *File {
 	return &File{
-		Ident:            FileIdent{},
+		FileHeader:       FileHeader{},
 		Header32:         ELF32Header{},
 		Header64:         ELF64Header{},
 		SectionHeaders32: []ELF32SectionHeader{},
@@ -143,6 +134,19 @@ func (f *File) stringTable(link uint32) ([]byte, error) {
 		return nil, errors.New("section has invalid string table link")
 	}
 	return f.Sections64[link].Data()
+}
+
+// getString extracts a string from an ELF string table.
+func getString(section []byte, start int) (string, bool) {
+	if start < 0 || start >= len(section) {
+		return "", false
+	}
+	for end := start; end < len(section); end++ {
+		if section[end] == 0 {
+			return string(section[start:end]), true
+		}
+	}
+	return "", false
 }
 
 // IsValidELFClass validates the ELF class of the binary.

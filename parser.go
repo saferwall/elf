@@ -254,19 +254,6 @@ func (p *Parser) parseELFSectionHeader64() error {
 	return nil
 }
 
-// getString extracts a string from an ELF string table.
-func getString(section []byte, start int) (string, bool) {
-	if start < 0 || start >= len(section) {
-		return "", false
-	}
-	for end := start; end < len(section); end++ {
-		if section[end] == 0 {
-			return string(section[start:end]), true
-		}
-	}
-	return "", false
-}
-
 // ParseELFSections reads the raw elf sections.
 func (p *Parser) ParseELFSections(c Class) error {
 
@@ -448,10 +435,6 @@ func (p *Parser) ParseELFSymbols(c Class, typ SectionType) error {
 	}
 	return errors.New("unknown ELF class")
 }
-
-// ErrNoSymbols is returned by File.Symbols and File.DynamicSymbols
-// if there is no such section in the File.
-var ErrNoSymbols = errors.New("no symbol section")
 
 func (p *Parser) getSymbols32(typ SectionType) error {
 	symtabSection := p.F.GetSectionByType(typ)
