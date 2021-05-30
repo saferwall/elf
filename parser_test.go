@@ -102,7 +102,7 @@ func TestParser(t *testing.T) {
 			assert.EqualValues(t, tt.expectedHeader, p.F.Header64, "expected header equal")
 		}
 	})
-	t.Run("TestParseSectionHeader64", func(t *testing.T) {
+	t.Run("TestParseSectionHeader", func(t *testing.T) {
 		testCases := []struct {
 			path                    string
 			expectedIdent           FileIdent

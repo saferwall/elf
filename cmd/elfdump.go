@@ -37,4 +37,13 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(string(jsonHeader))
+	err = p.Parse()
+	if err != nil {
+		panic(err)
+	}
+	jsonFile, err := json.MarshalIndent(p.F, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsonFile))
 }

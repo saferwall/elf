@@ -41,7 +41,7 @@ package elf
 // EI_VERSION byte specifies the current elf version, currently the only valid value is EV_CURRENT=1.
 
 // Standard sections are sections that dominate ELF binaries.
-// such as :
+// ----------------------------------------------------------------
 // | Name   |      Type      |       Flags      |      Usage       |
 // |==-------------------------------------------------------------|
 // | .bss   | SHT_NOBITS     |        A,W       | Unitialized data |

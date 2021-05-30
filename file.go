@@ -38,14 +38,16 @@ type FileHeader struct {
 
 // A Symbol represents an entry in an ELF symbol table section.
 type Symbol struct {
-	Name        string
-	Info, Other byte
-	Section     SectionIndex
-	Value, Size uint64
+	Name  string       `json:"symbol_name"`
+	Info  byte         `json:"symbol_info"`
+	Other byte         `json:"symbol_other"`
+	Index SectionIndex `json:"symbol_index"`
+	Value uint64       `json:"symbol_value"`
+	Size  uint64       `json:"symbol_size"`
 	// Version and Library are present only for the dynamic symbol
 	// table.
-	Version string
-	Library string
+	Version string `json:"symbol_version"`
+	Library string `json:"symbol_library"`
 }
 
 // File is an in-memory iterable representation of a raw elf binary.
@@ -64,6 +66,8 @@ type File struct {
 	Symbols32        []ELF32SymbolTableEntry
 	Symbols64        []ELF64SymbolTableEntry
 	NamedSymbols     []Symbol
+	GNUVersion       []GNUVersion
+	GNUVersionSym    []byte
 }
 
 func NewBinaryFile() *File {

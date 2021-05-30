@@ -425,33 +425,36 @@ func (p *Parser) parseELFProgramHeaders32() error {
 }
 
 // ParseELFSymbols returns a slice of Symbols from parsing the symbol table
-// with the given type, along with the associated string table.
+// with the given type, along with the associated string table
+// (the null symbol at index 0 is omitted).
 func (p *Parser) ParseELFSymbols(c Class, typ SectionType) error {
 	switch c {
 	case ELFCLASS64:
-		return p.getSymbols64(typ)
+		_, _, err := p.getSymbols64(typ)
+		return err
 	case ELFCLASS32:
-		return p.getSymbols32(typ)
+		_, _, err := p.getSymbols32(typ)
+		return err
 	}
 	return errors.New("unknown ELF class")
 }
 
-func (p *Parser) getSymbols32(typ SectionType) error {
+func (p *Parser) getSymbols32(typ SectionType) ([]Symbol, []byte, error) {
 	symtabSection := p.F.GetSectionByType(typ)
 	if symtabSection == nil {
-		return ErrNoSymbols
+		return nil, nil, ErrNoSymbols
 	}
 	data, err := symtabSection.Data()
 	if err != nil {
-		return errors.New("cannot load symbol section")
+		return nil, nil, errors.New("cannot load symbol section")
 	}
 	symtab := bytes.NewReader(data)
 	if symtab.Len()%Sym32Size != 0 {
-		return errors.New("length of symbol section is not a multiple of SymSize")
+		return nil, nil, errors.New("length of symbol section is not a multiple of SymSize")
 	}
 	strdata, err := p.F.stringTable(symtabSection.Link)
 	if err != nil {
-		return errors.New("cannot load string table section")
+		return nil, nil, errors.New("cannot load string table section")
 	}
 	// The first entry is all zeros.
 	var skip [Sym32Size]byte
@@ -468,7 +471,7 @@ func (p *Parser) getSymbols32(typ SectionType) error {
 			Name:    str,
 			Info:    sym.Info,
 			Other:   sym.Other,
-			Section: SectionIndex(sym.Shndx),
+			Index:   SectionIndex(sym.Shndx),
 			Value:   uint64(sym.Value),
 			Size:    uint64(sym.Size),
 			Version: "",
@@ -478,24 +481,24 @@ func (p *Parser) getSymbols32(typ SectionType) error {
 	}
 	p.F.Symbols32 = symbols
 	p.F.NamedSymbols = namedSymbols
-	return nil
+	return namedSymbols, strdata, nil
 }
-func (p *Parser) getSymbols64(typ SectionType) error {
+func (p *Parser) getSymbols64(typ SectionType) ([]Symbol, []byte, error) {
 	symtabSection := p.F.GetSectionByType(typ)
 	if symtabSection == nil {
-		return ErrNoSymbols
+		return nil, nil, ErrNoSymbols
 	}
 	data, err := symtabSection.Data()
 	if err != nil {
-		return errors.New("cannot load symbol section")
+		return nil, nil, errors.New("cannot load symbol section")
 	}
 	symtab := bytes.NewReader(data)
 	if symtab.Len()%Sym64Size != 0 {
-		return errors.New("length of symbol section is not a multiple of Sym64Size")
+		return nil, nil, errors.New("length of symbol section is not a multiple of Sym64Size")
 	}
 	strdata, err := p.F.stringTable(symtabSection.Link)
 	if err != nil {
-		return errors.New("cannot load string table section")
+		return nil, nil, errors.New("cannot load string table section")
 	}
 	// The first entry is all zeros.
 	var skip [Sym64Size]byte
@@ -511,7 +514,7 @@ func (p *Parser) getSymbols64(typ SectionType) error {
 			Name:    str,
 			Info:    sym.Info,
 			Other:   sym.Other,
-			Section: SectionIndex(sym.Shndx),
+			Index:   SectionIndex(sym.Shndx),
 			Value:   sym.Value,
 			Size:    sym.Size,
 			Version: "",
@@ -519,7 +522,13 @@ func (p *Parser) getSymbols64(typ SectionType) error {
 		}
 		i++
 	}
+	err = p.ParseGNUVersionTable(strdata)
+	if err != nil {
+		for i := range namedSymbols {
+			namedSymbols[i].Library, namedSymbols[i].Version = p.gnuVersion(i)
+		}
+	}
 	p.F.Symbols64 = symbols
 	p.F.NamedSymbols = namedSymbols
-	return nil
+	return namedSymbols, strdata, nil
 }
