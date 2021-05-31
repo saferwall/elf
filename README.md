@@ -36,30 +36,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = p.ParseIdent()
+	err = p.Parse()
 	if err != nil {
 		panic(err)
 	}
-	err = p.ParseELFHeader(p.F.Class())
+	jsonFile, err := json.MarshalIndent(p.F.ELFBin64, "", "  ")
 	if err != nil {
 		panic(err)
 	}
-	jsonHeader, err := json.MarshalIndent(p.F.Header64, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(jsonHeader))
-
-	err = p.ParseELFSectionHeader(elf.ELFCLASS64)
-	if err != nil {
-		panic(err)
-	}
-	jsonHeader, err = json.MarshalIndent(p.F.SectionHeaders64, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(jsonHeader))
+	fmt.Println(string(jsonFile))
 }
+
 
 ```
 

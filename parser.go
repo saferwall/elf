@@ -510,6 +510,14 @@ func (p *Parser) getSymbols64(typ SectionType) ([]Symbol, []byte, error) {
 	for symtab.Len() > 0 {
 		binary.Read(symtab, p.F.ByteOrder(), &sym)
 		str, _ := getString(strdata, int(sym.Name))
+		symbols[i] = ELF64SymbolTableEntry{
+			Name:  sym.Name,
+			Info:  sym.Info,
+			Other: sym.Other,
+			Shndx: sym.Shndx,
+			Value: sym.Value,
+			Size:  sym.Size,
+		}
 		namedSymbols[i] = Symbol{
 			Name:    str,
 			Info:    sym.Info,

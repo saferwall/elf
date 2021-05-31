@@ -55,36 +55,15 @@ type Symbol struct {
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
 	FileHeader
-	Header32         ELF32Header
-	Header64         ELF64Header
-	SectionHeaders32 []ELF32SectionHeader
-	SectionHeaders64 []ELF64SectionHeader
-	ProgramHeaders32 []ELF32ProgramHeader
-	ProgramHeaders64 []ELF64ProgramHeader
-	Sections32       []*ELF32Section
-	Sections64       []*ELF64Section
-	Symbols32        []ELF32SymbolTableEntry
-	Symbols64        []ELF64SymbolTableEntry
-	NamedSymbols     []Symbol
-	GNUVersion       []GNUVersion
-	GNUVersionSym    []byte
+	ELFBin32
+	ELFBin64
+	NamedSymbols  []Symbol
+	GNUVersion    []GNUVersion
+	GNUVersionSym []byte
 }
 
 func NewBinaryFile() *File {
-	return &File{
-		FileHeader:       FileHeader{},
-		Header32:         ELF32Header{},
-		Header64:         ELF64Header{},
-		SectionHeaders32: []ELF32SectionHeader{},
-		SectionHeaders64: []ELF64SectionHeader{},
-		ProgramHeaders32: []ELF32ProgramHeader{},
-		ProgramHeaders64: []ELF64ProgramHeader{},
-		Sections32:       []*ELF32Section{},
-		Sections64:       []*ELF64Section{},
-		Symbols32:        []ELF32SymbolTableEntry{},
-		Symbols64:        []ELF64SymbolTableEntry{},
-		NamedSymbols:     []Symbol{},
-	}
+	return &File{}
 }
 
 // Class returns ELFClass of the binary (designates the target architecture of the binary x64 or x86)
