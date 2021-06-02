@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/saferwall/elf"
@@ -18,9 +17,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	jsonFile, err := json.MarshalIndent(p.F.ELFBin64, "", "  ")
+	jsonFile, err := p.DumpJSON()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(jsonFile))
+	fmt.Println(jsonFile)
 }

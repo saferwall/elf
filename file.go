@@ -50,16 +50,21 @@ type Symbol struct {
 	Library string `json:"symbol_library"`
 }
 
+// ELFSymbols represents all symbol data.
+type ELFSymbols struct {
+	NamedSymbols  []Symbol     `json:",omitempty"`
+	GNUVersion    []GNUVersion `json:",omitempty"`
+	GNUVersionSym []byte       `json:",omitempty"`
+}
+
 // File is an in-memory iterable representation of a raw elf binary.
 // this is merely used to ease the use of the package as a library
 // and allow feature modification and rebuilding of ELF files.
 type File struct {
-	FileHeader
-	ELFBin32
-	ELFBin64
-	NamedSymbols  []Symbol
-	GNUVersion    []GNUVersion
-	GNUVersionSym []byte
+	FileHeader `json:",omitempty"`
+	ELFBin32   `json:",omitempty"`
+	ELFBin64   `json:",omitempty"`
+	ELFSymbols `json:",omitempty"`
 }
 
 func NewBinaryFile() *File {

@@ -531,7 +531,7 @@ func (p *Parser) getSymbols64(typ SectionType) ([]Symbol, []byte, error) {
 		i++
 	}
 	err = p.ParseGNUVersionTable(strdata)
-	if err != nil {
+	if err == nil {
 		for i := range namedSymbols {
 			namedSymbols[i].Library, namedSymbols[i].Version = p.gnuVersion(i)
 		}
