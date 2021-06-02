@@ -1608,4 +1608,56 @@ func TestFlags(t *testing.T) {
 			assert.Equal(t, SymVis(v.flag).String(), v.name)
 		}
 	})
+	t.Run("TestStringArch", func(t *testing.T) {
+		for _, v := range rx86_64Strings {
+			assert.Equal(t, R_X86_64(v.flag).String(), v.name)
+			assert.Equal(t, R_X86_64(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range raarch64Strings {
+			assert.Equal(t, R_AARCH64(v.flag).String(), v.name)
+			assert.Equal(t, R_AARCH64(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range ralphaStrings {
+			assert.Equal(t, R_ALPHA(v.flag).String(), v.name)
+			assert.Equal(t, R_ALPHA(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range rarmStrings {
+			assert.Equal(t, R_ARM(v.flag).String(), v.name)
+			assert.Equal(t, R_ARM(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range r386Strings {
+			assert.Equal(t, R_386(v.flag).String(), v.name)
+			assert.Equal(t, R_386(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range rmipsStrings {
+			assert.Equal(t, R_MIPS(v.flag).String(), v.name)
+			assert.Equal(t, R_MIPS(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range rppcStrings {
+			assert.Equal(t, R_PPC(v.flag).String(), v.name)
+			assert.Equal(t, R_PPC(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range rppc64Strings {
+			assert.Equal(t, R_PPC64(v.flag).String(), v.name)
+			assert.Equal(t, R_PPC64(v.flag).GoString(), "elf."+v.name)
+		}
+		for _, v := range rriscvStrings {
+			assert.Equal(t, R_RISCV(v.flag).String(), v.name)
+			assert.Equal(t, R_RISCV(v.flag).GoString(), "elf."+v.name)
+
+		}
+		for _, v := range rsparcStrings {
+			assert.Equal(t, R_SPARC(v.flag).String(), v.name)
+			assert.Equal(t, R_SPARC(v.flag).GoString(), "elf."+v.name)
+
+		}
+
+	})
 }

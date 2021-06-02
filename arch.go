@@ -1271,7 +1271,7 @@ var rppc64Strings = []flagName{
 	{58, "R_PPC64_GOT16_DS"},
 	{59, "R_PPC64_GOT16_LO_DS"},
 	{60, "R_PPC64_PLT16_LO_DS"},
-	{61, "R_PPC64_SECTOFF_DS"},
+	// {61, "R_PPC64_SECTOFF_DS"},
 	{61, "R_PPC64_SECTOFF_LO_DS"},
 	{63, "R_PPC64_TOC16_DS"},
 	{64, "R_PPC64_TOC16_LO_DS"},
