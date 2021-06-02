@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// DumpJSON marshals the entire binary representation into JSON Format.
-func (p *Parser) DumpJSON() (string, error) {
+// DumpRawJSON marshals the raw binary representation into JSON Format.
+func (p *Parser) DumpRawJSON() (string, error) {
 
 	var jsonOutput strings.Builder
 

@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	jsonFile, err := p.DumpJSON()
+	jsonFile, err := p.DumpRawJSON()
 	if err != nil {
 		panic(err)
 	}

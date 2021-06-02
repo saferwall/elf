@@ -1549,5 +1549,63 @@ func TestParser(t *testing.T) {
 			assert.EqualValues(t, tt.expectedSymbolsLength, len(p.F.NamedSymbols))
 		}
 	})
+}
 
+func TestFlags(t *testing.T) {
+	t.Run("TestStringFlags", func(t *testing.T) {
+		for _, v := range classStrings {
+			assert.Equal(t, Class(v.flag).String(), v.name)
+		}
+		for _, v := range dataStrings {
+			assert.Equal(t, Data(v.flag).String(), v.name)
+		}
+		for _, v := range versionStrings {
+			assert.Equal(t, Version(v.flag).String(), v.name)
+		}
+		for _, v := range osABIStrings {
+			assert.Equal(t, OSABI(v.flag).String(), v.name)
+		}
+		for _, v := range typeStrings {
+			assert.Equal(t, Type(v.flag).String(), v.name)
+		}
+		for _, v := range machineStrings {
+			assert.Equal(t, Machine(v.flag).String(), v.name)
+		}
+		for _, v := range sectionIndexStrings {
+			assert.Equal(t, SectionIndex(v.flag).String(), v.name)
+		}
+		for _, v := range sectionFlagStrings {
+			assert.Equal(t, SectionFlag(v.flag).String(), v.name)
+		}
+		for _, v := range sectionTypeStrings {
+			assert.Equal(t, SectionType(v.flag).String(), v.name)
+		}
+		for _, v := range compressionStrings {
+			assert.Equal(t, CompressionType(v.flag).String(), v.name)
+		}
+		for _, v := range programTypeStrings {
+			assert.Equal(t, ProgType(v.flag).String(), v.name)
+		}
+		for _, v := range programFlagStrings {
+			assert.Equal(t, ProgFlag(v.flag).String(), v.name)
+		}
+		for _, v := range dtStrings {
+			assert.Equal(t, DynTag(v.flag).String(), v.name)
+		}
+		for _, v := range dflagStrings {
+			assert.Equal(t, DynFlag(v.flag).String(), v.name)
+		}
+		for _, v := range ntypeStrings {
+			assert.Equal(t, NType(v.flag).String(), v.name)
+		}
+		for _, v := range stbStrings {
+			assert.Equal(t, SymBind(v.flag).String(), v.name)
+		}
+		for _, v := range sttStrings {
+			assert.Equal(t, SymType(v.flag).String(), v.name)
+		}
+		for _, v := range stvStrings {
+			assert.Equal(t, SymVis(v.flag).String(), v.name)
+		}
+	})
 }
