@@ -18,27 +18,19 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-
-      - name: Install dependencies
-        run: |
-          go version
-          go get -u golang.org/x/lint/golint
-
-      - name: Build
-        run: |
-          go env -w GOFLAGS=-mod=mod
-          go build -v ./...
+          check-latest: true
+          cache: true
 
       - name: Test With Coverage
         run: go test -race -coverprofile=coverage -covermode=atomic
+
+      - name: Run Vet & Staticcheck
+        run: |
+          go vet .
+          staticcheck
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
           files: ./coverage
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Run Vet & Lint
-        run: |
-          go vet .
-          golint .
