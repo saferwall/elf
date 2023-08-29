@@ -1,4 +1,4 @@
-# ELF File Format Parser 
+# ELF File Format Parser
 
 -----
 
@@ -48,10 +48,11 @@ func main() {
 	fmt.Println(jsonFile)
 }
 
-
-
 ```
 
-## Docs & API
+## References
 
-:construction:
+- https://refspecs.linuxfoundation.org/elf/elf.pdf
+- https://github.com/freebsd/freebsd-src/blob/main/sys/sys/elf_common.h
+
+
