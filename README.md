@@ -1,10 +1,10 @@
+<a href="https://saferwall.com" target="_blank" rel="noopener noreferrer"><img align="right" width="100" src=".github/assets/logo.png" alt="Saferwall logo"></a>
+
 # ELF File Format Parser
 
------
+[![GoDoc](http://godoc.org/github.com/saferwall/elf?status.svg)](https://pkg.go.dev/github.com/saferwall/elf) ![Go Version](https://img.shields.io/badge/go%20version-%3E=1.17-61CFDD.svg) [![Report Card](https://goreportcard.com/badge/github.com/saferwall/elf)](https://goreportcard.com/report/github.com/saferwall/elf) [![codecov](https://codecov.io/gh/saferwall/elf/branch/main/graph/badge.svg?token=ND685DTHZT)](https://codecov.io/gh/saferwall/elf) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/saferwall/elf/ci.yaml?branch=main)
 
-[![codecov](https://codecov.io/gh/saferwall/elf/branch/main/graph/badge.svg?token=ND685DTHZT)](https://codecov.io/gh/saferwall/elf) [![build-test](https://github.com/saferwall/elf/actions/workflows/ci.yaml/badge.svg)](https://github.com/saferwall/elf/actions/workflows/ci.yaml)
-
-```elf``` is a lightweight :sparkles: ELF parser designed for static analysis.
+**elf** is a go package for parsing Executable and Linkable Format (ELF). This package is designed for static malware analysis and reverse engineering.
 
 ## Install
 
