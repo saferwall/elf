@@ -360,7 +360,7 @@ func (p *Parser) parseELFSections32() error {
 
 	for i, s := range sections {
 		var ok bool
-		s.SectionName, ok = getString(shstrtab, int(p.F.SectionHeaders64[i].Name))
+		s.SectionName, ok = getString(shstrtab, int(p.F.SectionHeaders32[i].Name))
 		if !ok {
 			return errors.New("failed to parse string table")
 		}
