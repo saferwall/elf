@@ -353,7 +353,7 @@ func (p *Parser) parseELFSections32() error {
 	if len(sections) == 0 {
 		return errors.New("binary has no sections")
 	}
-	shstrtab, err := sections[p.F.Header64.Shstrndx].Data()
+	shstrtab, err := sections[p.F.Header32.Shstrndx].Data()
 	if err != nil {
 		return errors.New("error reading the section header strings table " + err.Error())
 	}
