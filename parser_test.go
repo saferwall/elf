@@ -86,7 +86,7 @@ func TestParser(t *testing.T) {
 		}
 
 		for _, tt := range testCases {
-			p, err := New(tt.path)
+			p, err := New(tt.path, nil)
 			if err != nil {
 				t.Fatal("failed to create new parser with error :", err)
 			}
@@ -473,7 +473,7 @@ func TestParser(t *testing.T) {
 		}
 
 		for _, tt := range testCases {
-			p, err := New(tt.path)
+			p, err := New(tt.path, nil)
 			if err != nil {
 				t.Fatal("failed to create new parser with error :", err)
 			}
@@ -898,7 +898,7 @@ func TestParser(t *testing.T) {
 		}
 
 		for _, tt := range testCases {
-			p, err := New(tt.path)
+			p, err := New(tt.path, nil)
 			if err != nil {
 				t.Fatal("failed to create new parser with error :", err)
 			}
@@ -1086,7 +1086,7 @@ func TestParser(t *testing.T) {
 		}
 
 		for _, tt := range testCases {
-			p, err := New(tt.path)
+			p, err := New(tt.path, nil)
 			if err != nil {
 				t.Fatal("failed to create new parser with error :", err)
 			}
@@ -1514,7 +1514,7 @@ func TestParser(t *testing.T) {
 		}
 
 		for _, tt := range testCases {
-			p, err := New(tt.path)
+			p, err := New(tt.path, nil)
 			if err != nil {
 				t.Fatal("failed to create new parser with error :", err)
 			}

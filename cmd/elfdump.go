@@ -48,7 +48,7 @@ func dumpFileHeader(fileHdr elf.FileHeader) {
 }
 
 func parse(filename string, cfg config) {
-	p, err := elf.New(filename)
+	p, err := elf.New(filename, nil)
 	defer p.CloseFile()
 	if err != nil {
 		panic(err)

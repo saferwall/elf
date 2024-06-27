@@ -3,6 +3,8 @@ package elf
 import (
 	"encoding/binary"
 	"errors"
+
+	"github.com/saferwall/elf/log"
 )
 
 // FileIdent is a representation of the raw ident array (first 16 bytes of an ELF file)
@@ -65,6 +67,8 @@ type File struct {
 	ELFBin32   `json:",omitempty"`
 	ELFBin64   `json:",omitempty"`
 	ELFSymbols `json:",omitempty"`
+	opts       *Options
+	logger     *log.Helper
 }
 
 func NewBinaryFile() *File {
