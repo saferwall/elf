@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${file}",
-            "args": ["dump", "--file-header"]
+            "args": ["dump", "--file-header", "/bin/ls"]
         },
         {
             "name": "Attach to Process",
