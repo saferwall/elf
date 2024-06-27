@@ -54,5 +54,3 @@ func main() {
 
 - https://refspecs.linuxfoundation.org/elf/elf.pdf
 - https://github.com/freebsd/freebsd-src/blob/main/sys/sys/elf_common.h
-
-

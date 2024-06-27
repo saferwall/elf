@@ -6,9 +6,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+
+	"github.com/saferwall/elf/log"
 
 	"github.com/saferwall/binstream"
 )
+
+// Options that influence the PE parsing behaviour.
+type Options struct {
+
+	// A custom logger.
+	Logger log.Logger
+}
 
 // Parser implements a parsing engine for the ELF file format.
 type Parser struct {
@@ -17,27 +27,60 @@ type Parser struct {
 }
 
 // New creates a new instance of parser.
-func New(filename string) (*Parser, error) {
+func New(filename string, opts *Options) (*Parser, error) {
 	fs, err := binstream.NewFileStream(filename)
 	if err != nil {
 		return nil, err
 	}
+	file := File{}
+	if opts != nil {
+		file.opts = opts
+	} else {
+		file.opts = &Options{}
+	}
+
+	var logger log.Logger
+	if file.opts.Logger == nil {
+		logger = log.NewStdLogger(os.Stdout)
+		file.logger = log.NewHelper(log.NewFilter(logger,
+			log.FilterLevel(log.LevelError)))
+	} else {
+		file.logger = log.NewHelper(file.opts.Logger)
+	}
+
 	p := &Parser{
 		fs: fs,
-		F:  &File{},
+		F:  &file,
 	}
 	return p, nil
 }
 
 // NewBytes creates a new instance of parser from a byte slice representig the ELF binary.
-func NewBytes(data []byte) (*Parser, error) {
+func NewBytes(data []byte, opts *Options) (*Parser, error) {
 	fs, err := binstream.NewByteStream(data)
 	if err != nil {
 		return nil, err
 	}
+
+	file := File{}
+	if opts != nil {
+		file.opts = opts
+	} else {
+		file.opts = &Options{}
+	}
+
+	var logger log.Logger
+	if file.opts.Logger == nil {
+		logger = log.NewStdLogger(os.Stdout)
+		file.logger = log.NewHelper(log.NewFilter(logger,
+			log.FilterLevel(log.LevelError)))
+	} else {
+		file.logger = log.NewHelper(file.opts.Logger)
+	}
+
 	p := &Parser{
 		fs: fs,
-		F:  &File{},
+		F:  &file,
 	}
 	return p, nil
 }
